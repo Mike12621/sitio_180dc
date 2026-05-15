@@ -33,29 +33,6 @@ sitio_180dc/
 
 ---
 
-## Cómo subirlo a GitHub Pages (paso a paso)
-
-### 1. Crear el repositorio
-1. En GitHub: **New repository** → nombre (ej. `180dc-pucp-transparencia`).
-2. En tu computadora, dentro de la carpeta del proyecto:
-   ```bash
-   git init
-   git add .
-   git commit -m "Sitio inicial portal de transparencia"
-   git branch -M main
-   git remote add origin https://github.com/<tu-usuario>/180dc-pucp-transparencia.git
-   git push -u origin main
-   ```
-
-### 2. Activar GitHub Pages
-En el repositorio de GitHub: **Settings → Pages → Build and deployment →
-Source: GitHub Actions**. (No elijas "Deploy from a branch".)
-
-### 3. Listo
-El workflow `.github/workflows/deploy.yml` corre automáticamente en cada
-`push` a `main`: instala dependencias, ejecuta `python scripts/build.py` y
-publica el contenido de `site/`. En 1–2 minutos verás la URL pública en la
-pestaña **Actions** o en **Settings → Pages**.
 
 ---
 
