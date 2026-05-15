@@ -38,7 +38,7 @@ MARZO = {
             "icono": "🥨",
         },
         {
-            "titulo": "Materiales y papelotes",
+            "titulo": "Materiales",
             "monto": 131.17,
             "fecha": "24/03/2026",
             "para_que": "Papelotes, plumones e insumos para dinámicas de la bienvenida.",
@@ -60,7 +60,7 @@ MARZO = {
             "icono": "🪪",
         },
         {
-            "titulo": "Polos institucionales (lote 1)",
+            "titulo": "Polos institucionales",
             "monto": 120.0,
             "fecha": "13/03/2026 - 18/03/2026",
             "para_que": "Compra de polos con identidad 180DC para miembros del ciclo.",
