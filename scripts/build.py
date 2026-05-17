@@ -1,19 +1,7 @@
 """
 build.py — Genera el sitio estático del Portal de Transparencia 180DC PUCP.
-
-Uso:
-    python scripts/build.py
-
-Lee:
-  - data/transacciones_*.xlsx
-  - scripts/config_mes.py (narrativa por mes)
-
-Escribe:
-  - site/index.html
-  - site/meses/<mes>.html
 """
 from __future__ import annotations
-import json
 import sys
 from pathlib import Path
 
@@ -31,30 +19,22 @@ MESES_CONFIG = [
     {"mes": "Abril", "slug": "abril", "xlsx": "transacciones_abril.xlsx"},
 ]
 
-# =============================================================================
-# Helpers de HTML
-# =============================================================================
-def esc(s):
-    if s is None:
-        return ""
-    return (str(s)
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;"))
-
 import re
 import math
 
 _MD_BOLD = re.compile(r"\*\*(.+?)\*\*", re.DOTALL)
 
+def esc(s):
+    if s is None:
+        return ""
+    return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+
 def md(s):
-    """Escape + convierte **bold** Markdown a <strong>."""
     return _MD_BOLD.sub(r"<strong>\1</strong>", esc(s))
 
 def svg_donut(labels, values, colores, total_label, size=260):
-    """Donut SVG inline. Devuelve string SVG completo."""
     if not values or sum(values) == 0:
-        return f'<div class="chart-wrap" style="display:flex;align-items:center;justify-content:center;color:var(--plomo)">Sin datos</div>'
+        return '<div class="chart-empty">Sin datos</div>'
     total = sum(values)
     cx, cy = size/2, size/2
     r_out, r_in = size*0.42, size*0.42*0.62
@@ -86,8 +66,8 @@ def svg_donut(labels, values, colores, total_label, size=260):
         f'<div class="donut-block">'
         f'<svg viewBox="0 0 {size} {size}" width="100%" height="{size}" preserveAspectRatio="xMidYMid meet">'
         f'{"".join(paths)}'
-        f'<text x="{cx}" y="{cy-4}" text-anchor="middle" font-size="11" fill="#6C757D">Total</text>'
-        f'<text x="{cx}" y="{cy+14}" text-anchor="middle" font-size="16" font-weight="700" fill="#003C71">{total_label}</text>'
+        f'<text x="{cx}" y="{cy-4}" text-anchor="middle" font-size="11" fill="#6B7280">Total</text>'
+        f'<text x="{cx}" y="{cy+14}" text-anchor="middle" font-size="16" font-weight="700" fill="#1F2937">{total_label}</text>'
         f'</svg>'
         f'<ul class="donut-legend">{"".join(legend_rows)}</ul>'
         f'</div>'
@@ -95,8 +75,7 @@ def svg_donut(labels, values, colores, total_label, size=260):
 
 
 def svg_barras(labels, values, colores, width=420, height=260):
-    """Barras verticales SVG inline."""
-    pad_l, pad_r, pad_t, pad_b = 40, 16, 16, 36
+    pad_l, pad_r, pad_t, pad_b = 44, 16, 20, 40
     w = width - pad_l - pad_r
     h = height - pad_t - pad_b
     max_v = max(values) if values else 1
@@ -106,7 +85,7 @@ def svg_barras(labels, values, colores, width=420, height=260):
     step = next((s for s in step_candidates if max_v/s <= 5), max_v)
     nice = math.ceil(max_v / step) * step
     n = len(values)
-    bw = w / n * 0.55
+    bw = w / n * 0.5
     gap = w / n
     bars = []
     labels_x = []
@@ -115,13 +94,13 @@ def svg_barras(labels, values, colores, width=420, height=260):
         bh = (v / nice) * h if nice > 0 else 0
         y = pad_t + h - bh
         bars.append(
-            f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{bh:.1f}" rx="4" fill="{c}"/>'
-            f'<text x="{x + bw/2:.1f}" y="{y - 6:.1f}" text-anchor="middle" '
-            f'font-size="11" font-weight="600" fill="#1F2937">{fmt_soles(v)}</text>'
+            f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{bh:.1f}" rx="6" fill="{c}"/>'
+            f'<text x="{x + bw/2:.1f}" y="{y - 8:.1f}" text-anchor="middle" '
+            f'font-size="12" font-weight="700" fill="#1F2937">{fmt_soles(v)}</text>'
         )
         labels_x.append(
-            f'<text x="{x + bw/2:.1f}" y="{pad_t + h + 18:.1f}" text-anchor="middle" '
-            f'font-size="11" fill="#4B5563">{esc(lbl)}</text>'
+            f'<text x="{x + bw/2:.1f}" y="{pad_t + h + 22:.1f}" text-anchor="middle" '
+            f'font-size="12" fill="#4B5563" font-weight="500">{esc(lbl)}</text>'
         )
     yticks = []
     for k in range(5):
@@ -130,7 +109,7 @@ def svg_barras(labels, values, colores, width=420, height=260):
         yticks.append(
             f'<line x1="{pad_l}" y1="{y:.1f}" x2="{pad_l+w}" y2="{y:.1f}" '
             f'stroke="#E5E7EB" stroke-dasharray="2,3"/>'
-            f'<text x="{pad_l-6}" y="{y+3:.1f}" text-anchor="end" font-size="10" fill="#6C757D">S/ {val:.0f}</text>'
+            f'<text x="{pad_l-8}" y="{y+3:.1f}" text-anchor="end" font-size="10" fill="#9CA3AF">S/ {val:.0f}</text>'
         )
     return (
         f'<svg viewBox="0 0 {width} {height}" width="100%" preserveAspectRatio="xMidYMid meet">'
@@ -159,13 +138,20 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{esc(titulo)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{asset_prefix}/assets/style.css">
 </head>
 <body>
   <header class="site-header">
     <div class="wrap">
-      <h1>180DC PUCP · Portal de Transparencia Financiera</h1>
-      <p>Ciclo académico 2026-1 · Rendición de cuentas mensual</p>
+      <div class="brand">
+        <div class="brand-text">
+          <h1>Portal de Transparencia Financiera</h1>
+          <p>180 Degrees Consulting PUCP · Ciclo 2026-1</p>
+        </div>
+      </div>
       {nav}
     </div>
   </header>
@@ -173,8 +159,10 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
     {body}
   </main>
   <footer>
-    Portal de transparencia 180DC PUCP · Fuente: Registro de Transacciones mensual ·
-    Generado automáticamente a partir de los archivos contables del ciclo.
+    <div class="wrap">
+      <p><strong>180 Degrees Consulting PUCP</strong> · Portal de Transparencia Financiera</p>
+      <p class="footer-muted">Generado a partir del Registro de Transacciones mensual del área financiera.</p>
+    </div>
   </footer>
 </body>
 </html>
@@ -184,7 +172,6 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
 # Página mes
 # =============================================================================
 def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str) -> str:
-    # ---- KPIs
     kpis_html = f"""
     <div class="kpis">
       <div class="kpi"><div class="label">Saldo inicial</div><div class="value">{fmt_soles(info.saldo_inicial)}</div></div>
@@ -195,85 +182,80 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
     </div>
     """
 
-    # ---- Ecuación
     ecuacion_html = f"""
     <div class="ecuacion">
-      <p><strong>Cómo se llegó al saldo final del mes</strong></p>
+      <p class="ecuacion-titulo">Cálculo del saldo final</p>
       <div class="form">
-        {fmt_soles(info.saldo_inicial)}
-        &nbsp;<span style="color:var(--verde)">+ {fmt_soles(info.ingresos)}</span>
-        &nbsp;<span style="color:var(--rojo)">− {fmt_soles(info.egresos_op)}</span>
-        &nbsp;<span style="color:var(--ambar)">− {fmt_soles(info.inversion)}</span>
-        &nbsp;= <strong>{fmt_soles(info.saldo_final)}</strong>
+        <span class="op-val">{fmt_soles(info.saldo_inicial)}</span>
+        <span class="op-sign verde">+</span>
+        <span class="op-val">{fmt_soles(info.ingresos)}</span>
+        <span class="op-sign rojo">−</span>
+        <span class="op-val">{fmt_soles(info.egresos_op)}</span>
+        <span class="op-sign ambar">−</span>
+        <span class="op-val">{fmt_soles(info.inversion)}</span>
+        <span class="op-sign">=</span>
+        <span class="op-result">{fmt_soles(info.saldo_final)}</span>
       </div>
-      <p class="muted" style="margin-top:10px">
-        Saldo inicial + Ingresos − Egresos operativos − Inversión = Saldo final
-      </p>
+      <p class="ecuacion-leyenda">Saldo inicial + Ingresos − Egresos operativos − Inversión</p>
     </div>
     """
 
-    # ---- Caja informativa sobre inversión (solo si hay inversión > 0)
     info_box = ""
     if info.inversion > 0:
         info_box = """
         <div class="info-box">
-          <strong>¿Qué es "Inversión"?</strong>
-          A diferencia de un gasto operativo (bocaditos, transporte, impuestos
-          que se consumen el mismo mes), una <strong>inversión</strong> compra
-          bienes que se quedan con la agrupación y se siguen usando en ciclos
-          futuros (por ejemplo: polos institucionales y photochecks que se
-          entregan a miembros año a año). Por eso se muestra por separado.
+          <strong>Sobre la Inversión IME:</strong>
+          A diferencia de un gasto operativo —que se consume durante el mes—
+          una inversión corresponde a bienes durables que permanecen como
+          activo de la agrupación y se reutilizan en ciclos posteriores
+          (polos institucionales, photochecks, equipamiento). Se reporta
+          separada para no distorsionar el resultado operativo del mes.
         </div>
         """
 
-    # ---- Ingresos
     fuentes = narrativa.get("fuentes_ingresos", [])
     cards_ingreso = []
     for f in fuentes:
         cards_ingreso.append(f"""
         <article class="card ingreso">
           <div class="top">
-            <h3><span class="icono">{f.get('icono','💰')}</span> {esc(f['nombre'])}</h3>
+            <h3>{esc(f['nombre'])}</h3>
             <div class="monto">+ {fmt_soles(f['monto'])}</div>
           </div>
-          <dl>
-            <div><dt>Detalle</dt><dd>{esc(f.get('detalle',''))}</dd></div>
-          </dl>
+          <p class="card-text">{esc(f.get('detalle',''))}</p>
         </article>
         """)
     if not cards_ingreso:
         cards_ingreso.append('<p class="muted">No se registran fuentes de ingreso descritas para este mes.</p>')
 
-    # ---- Egresos (operativos + inversión, ordenados por monto desc.)
     egresos_cfg = narrativa.get("egresos", [])
     egresos_cfg = sorted(egresos_cfg, key=lambda e: e["monto"], reverse=True)
     cards_eg = []
     for e in egresos_cfg:
         cls = "inversion" if e.get("es_inversion") else ""
         badge_cls = "inv" if e.get("es_inversion") else "op"
-        badge_txt = "Inversión" if e.get("es_inversion") else "Gasto operativo"
+        badge_txt = "Inversión IME" if e.get("es_inversion") else "Operativo"
         cards_eg.append(f"""
         <article class="card {cls}">
           <div class="top">
-            <div>
-              <h3><span class="icono">{e.get('icono','💸')}</span> {esc(e['titulo'])}
-                  <span class="badge {badge_cls}">{badge_txt}</span></h3>
+            <div class="top-info">
+              <h3>{esc(e['titulo'])}</h3>
               <div class="meta">
+                <span class="badge {badge_cls}">{badge_txt}</span>
+                <span class="meta-sep">·</span>
                 <span>{esc(e.get('fecha',''))}</span>
+                <span class="meta-sep">·</span>
                 <span>{esc(e.get('categoria_ui',''))}</span>
               </div>
             </div>
             <div class="monto">− {fmt_soles(e['monto'])}</div>
           </div>
-          <dl>
-            <div><dt>Descripción</dt><dd>{esc(e.get('para_que',''))}</dd></div>
-          </dl>
+          <p class="card-text">{esc(e.get('para_que',''))}</p>
         </article>
         """)
     if not cards_eg:
         cards_eg.append('<p class="muted">No hubo egresos descritos en el mes.</p>')
 
-    # ---- Distribución (SVG donut)
     dist = {}
     for e in egresos_cfg:
         c = e.get("categoria_ui", "Otros")
@@ -281,68 +263,76 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
     dist_items = sorted(dist.items(), key=lambda x: x[1], reverse=True)
     dist_labels = [k for k,_ in dist_items]
     dist_data = [v for _,v in dist_items]
-    colores = ["#003C71", "#0072CE", "#F6AE2D", "#F26419", "#2BA84A", "#6C757D", "#9D4EDD"]
+    colores = ["#7AB929", "#1F2937", "#F59E0B", "#3B82F6", "#EF4444", "#6B7280", "#8B5CF6"]
     color_list = [colores[i % len(colores)] for i in range(len(dist_labels))]
     donut_svg = svg_donut(dist_labels, dist_data, color_list,
                           fmt_soles(sum(dist_data)) if dist_data else "S/ 0")
 
-    # ---- Barras comparativo (SVG)
     cmp_labels = ["Ingresos", "Egresos op.", "Inversión"]
     cmp_values = [info.ingresos, info.egresos_op, info.inversion]
-    cmp_colors = ["#2BA84A", "#D7263D", "#F6AE2D"]
+    cmp_colors = ["#7AB929", "#EF4444", "#F59E0B"]
     barras_svg = svg_barras(cmp_labels, cmp_values, cmp_colors)
 
     nota = narrativa.get("nota_cierre", "")
-    cierre_html = f'<div class="cierre"><strong>En resumen.</strong> {md(nota)}</div>' if nota else ""
+    cierre_html = f'<section class="cierre"><h3 class="section-title">Análisis del mes</h3><p>{md(nota)}</p></section>' if nota else ""
 
-    # ---- Bloque de descarga del archivo fuente
     descarga_html = f"""
     <div class="descarga">
       <div class="descarga-info">
         <strong>Archivo fuente del mes</strong>
-        <p>Toda la información de este informe proviene del Registro de
-           Transacciones contable. Puedes descargarlo para verificar línea
-           por línea.</p>
+        <p>Toda la información proviene del Registro de Transacciones
+           contable. Descárgalo para verificar línea por línea.</p>
       </div>
       <a class="btn-descarga" href="../downloads/{esc(xlsx_filename)}" download>
-        ⬇ Descargar Excel ({esc(xlsx_filename)})
+        Descargar Excel
+        <span class="btn-arrow">↓</span>
       </a>
     </div>
     """
 
-    # ---- Body
     body = f"""
-    <p class="muted">Mes contable: <strong>{info.mes} {info.ciclo}</strong> ·
-       Responsable de actualización: <strong>{esc(info.responsable)}</strong> ·
-       Última actualización: <strong>{esc(info.actualizacion)}</strong></p>
+    <section class="page-header">
+      <h2>{info.mes} {info.ciclo}</h2>
+      <p class="page-meta">Responsable: <strong>{esc(info.responsable)}</strong> · Última actualización: <strong>{esc(info.actualizacion)}</strong></p>
+    </section>
 
-    <h2>Resumen del mes</h2>
-    {kpis_html}
-    {ecuacion_html}
+    <section>
+      <h3 class="section-title">Resumen del mes</h3>
+      {kpis_html}
+      {ecuacion_html}
+    </section>
 
-    <h2>Origen de ingresos</h2>
-    <div class="cards">{''.join(cards_ingreso)}</div>
+    <section>
+      <h3 class="section-title">Ingresos</h3>
+      <div class="cards">{''.join(cards_ingreso)}</div>
+    </section>
 
-    <h2>Detalle de egresos</h2>
-    {info_box}
-    <div class="cards">{''.join(cards_eg)}</div>
+    <section>
+      <h3 class="section-title">Egresos</h3>
+      {info_box}
+      <div class="cards">{''.join(cards_eg)}</div>
+    </section>
 
-    <h2>Distribución del gasto</h2>
-    <div class="chart-grid">
-      <div class="chart-block">
-        <h3>Distribución de egresos por categoría</h3>
-        {donut_svg}
+    <section>
+      <h3 class="section-title">Distribución</h3>
+      <div class="chart-grid">
+        <div class="chart-block">
+          <h4>Egresos por categoría</h4>
+          {donut_svg}
+        </div>
+        <div class="chart-block">
+          <h4>Comparativo del mes</h4>
+          {barras_svg}
+        </div>
       </div>
-      <div class="chart-block">
-        <h3>Comparativo del mes</h3>
-        {barras_svg}
-      </div>
-    </div>
+    </section>
 
     {cierre_html}
 
-    <h2>Verificación y datos abiertos</h2>
-    {descarga_html}
+    <section>
+      <h3 class="section-title">Datos abiertos</h3>
+      {descarga_html}
+    </section>
     """
     return layout(f"{info.mes} 2026-1 · 180DC PUCP", body,
                   slug_actual=slug, asset_prefix="..")
@@ -359,7 +349,7 @@ def render_index(infos: list[InformeMes]) -> str:
 
     kpis = f"""
     <div class="kpis">
-      <div class="kpi"><div class="label">Saldo de inicio del ciclo</div><div class="value">{fmt_soles(saldo_inicio)}</div></div>
+      <div class="kpi"><div class="label">Saldo de inicio</div><div class="value">{fmt_soles(saldo_inicio)}</div></div>
       <div class="kpi verde"><div class="label">Ingresos acumulados</div><div class="value">{fmt_soles(total_ing)}</div></div>
       <div class="kpi rojo"><div class="label">Egresos operativos</div><div class="value">{fmt_soles(total_eg)}</div></div>
       <div class="kpi ambar"><div class="label">Inversión acumulada</div><div class="value">{fmt_soles(total_inv)}</div></div>
@@ -371,12 +361,14 @@ def render_index(infos: list[InformeMes]) -> str:
     for info, cfg in zip(infos, MESES_CONFIG):
         nota_resumen = NARRATIVA.get(info.mes, {}).get('nota_cierre', '')
         resumen_plano = re.sub(r"\*\*(.+?)\*\*", r"\1", nota_resumen)
-        if len(resumen_plano) > 140:
-            resumen_plano = resumen_plano[:140].rstrip() + "…"
+        if len(resumen_plano) > 160:
+            resumen_plano = resumen_plano[:160].rstrip() + "…"
         cards.append(f"""
         <a class="mes-card" href="meses/{cfg['slug']}.html">
-          <div class="mes">{info.mes} 2026-1</div>
-          <h3>Estado de cuenta del mes</h3>
+          <div class="mes-card-head">
+            <span class="mes-label">{info.mes} 2026-1</span>
+            <span class="mes-arrow">→</span>
+          </div>
           <p class="resumen">{esc(resumen_plano)}</p>
           <div class="stats">
             <div><span>Ingresos</span><b>{fmt_soles(info.ingresos)}</b></div>
@@ -387,36 +379,44 @@ def render_index(infos: list[InformeMes]) -> str:
         """)
 
     body = f"""
-    <p class="lead">
-      Este portal presenta de manera <strong>abierta y verificable</strong> el
-      movimiento financiero de la agrupación durante el ciclo 2026-1. Cada
-      egreso incluye una descripción del concepto correspondiente.
-    </p>
+    <section class="hero">
+      <h2>Información financiera abierta y verificable</h2>
+      <p>
+        Este portal reporta mes a mes el movimiento financiero de la
+        agrupación durante el ciclo 2026-1. Cada movimiento contable cuenta
+        con su descripción correspondiente y el archivo fuente está
+        disponible para descarga.
+      </p>
+    </section>
 
-    <h2>Visión del ciclo</h2>
-    {kpis}
+    <section>
+      <h3 class="section-title">Indicadores acumulados del ciclo</h3>
+      {kpis}
+      <div class="info-box">
+        <strong>Sobre la Inversión IME:</strong>
+        Separamos del gasto regular las compras de bienes durables que se
+        mantienen como activo de la agrupación y se reutilizan en ciclos
+        posteriores (polos, photochecks, equipamiento). Esto evita que un
+        mes con compras de inventario aparezca como deficitario.
+      </div>
+    </section>
 
-    <div class="info-box">
-      <strong>Sobre la "Inversión":</strong> separamos del gasto regular las
-      compras de bienes que <em>no se consumen</em> en el mes y se quedan con
-      la agrupación para ciclos futuros (polos institucionales, photochecks,
-      eventualmente equipamiento). Esto evita inflar los egresos del mes en que
-      se compraron.
-    </div>
+    <section>
+      <h3 class="section-title">Informes mensuales</h3>
+      <div class="meses-grid">{''.join(cards)}</div>
+    </section>
 
-    <h2>Informes mensuales</h2>
-    <div class="meses-grid">{''.join(cards)}</div>
-
-    <h2>Sobre la información publicada</h2>
-    <p>
-      Los montos se toman directamente del <em>Registro de Transacciones</em>
-      mensual que mantiene el área financiera. Cada movimiento del archivo
-      contable original tiene su correlativo en el portal, y el
-      <strong>archivo fuente de cada mes está disponible para descarga</strong>
-      desde su página correspondiente, para que cualquiera pueda verificar la
-      información línea por línea. Para preguntas o detalle adicional puedes
-      contactar al área financiera.
-    </p>
+    <section>
+      <h3 class="section-title">Metodología</h3>
+      <p class="prose">
+        Los montos provienen directamente del <em>Registro de Transacciones</em>
+        mensual que mantiene el área financiera. Cada movimiento del archivo
+        contable original tiene su correlativo en el portal. El archivo fuente
+        de cada mes puede descargarse desde su página correspondiente para
+        verificación línea por línea. Para consultas adicionales, comunícate
+        con el área financiera.
+      </p>
+    </section>
     """
     return layout("180DC PUCP · Portal de Transparencia Financiera", body,
                   slug_actual=None, asset_prefix=".")
