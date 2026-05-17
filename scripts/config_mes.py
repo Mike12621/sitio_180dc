@@ -1,17 +1,12 @@
 """
-config_mes.py — Diccionario por mes con la NARRATIVA de cada egreso e ingreso.
+config_mes.py — Diccionario por mes con la descripción de cada egreso e ingreso.
 
-Esto es lo único que se edita cuando llega un mes nuevo. Cada egreso lleva:
+Por cada egreso:
   - titulo:        nombre legible corto
-  - para_que:      en qué se usó el dinero
-  - beneficio:     a quién/qué benefició
-  - comprobante:   referencia opcional (Yape/Plin a quién, etc.)
+  - para_que:      descripción del gasto
   - categoria_ui:  cómo se agrupa en la torta
   - es_inversion:  True si es activo (no consumo del mes)
   - icono:         emoji opcional
-
-Si falta una entrada, el sistema usa los datos del xlsx tal cual y marca
-"info pendiente" en la página.
 """
 
 # Marzo 2026-1 ----------------------------------------------------------------

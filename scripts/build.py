@@ -63,7 +63,6 @@ def svg_donut(labels, values, colores, total_label, size=260):
     for v, c in zip(values, colores):
         frac = v/total
         end = start + frac * 2*math.pi
-        # arc points
         x1, y1 = cx + r_out*math.cos(start), cy + r_out*math.sin(start)
         x2, y2 = cx + r_out*math.cos(end),   cy + r_out*math.sin(end)
         x3, y3 = cx + r_in*math.cos(end),    cy + r_in*math.sin(end)
@@ -103,7 +102,6 @@ def svg_barras(labels, values, colores, width=420, height=260):
     max_v = max(values) if values else 1
     if max_v == 0:
         max_v = 1
-    # nice max (siguiente múltiplo "redondo")
     step_candidates = [10, 20, 50, 100, 200, 500, 1000, 2000]
     step = next((s for s in step_candidates if max_v/s <= 5), max_v)
     nice = math.ceil(max_v / step) * step
@@ -125,7 +123,6 @@ def svg_barras(labels, values, colores, width=420, height=260):
             f'<text x="{x + bw/2:.1f}" y="{pad_t + h + 18:.1f}" text-anchor="middle" '
             f'font-size="11" fill="#4B5563">{esc(lbl)}</text>'
         )
-    # eje y (4 ticks)
     yticks = []
     for k in range(5):
         val = nice * k / 4
@@ -241,7 +238,6 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
           </div>
           <dl>
             <div><dt>Detalle</dt><dd>{esc(f.get('detalle',''))}</dd></div>
-            <div><dt>Origen</dt><dd>{esc(f.get('beneficiarios',''))}</dd></div>
           </dl>
         </article>
         """)
@@ -270,9 +266,7 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
             <div class="monto">− {fmt_soles(e['monto'])}</div>
           </div>
           <dl>
-            <div><dt>¿En qué se usó?</dt><dd>{esc(e.get('para_que',''))}</dd></div>
-            <div><dt>¿A quién benefició?</dt><dd>{esc(e.get('beneficio',''))}</dd></div>
-            <div><dt>Comprobante</dt><dd>{esc(e.get('comprobante','—'))}</dd></div>
+            <div><dt>Descripción</dt><dd>{esc(e.get('para_que',''))}</dd></div>
           </dl>
         </article>
         """)
@@ -326,14 +320,14 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
     {kpis_html}
     {ecuacion_html}
 
-    <h2>¿De dónde vino el dinero?</h2>
+    <h2>Origen de ingresos</h2>
     <div class="cards">{''.join(cards_ingreso)}</div>
 
-    <h2>¿En qué se usó el dinero?</h2>
+    <h2>Detalle de egresos</h2>
     {info_box}
     <div class="cards">{''.join(cards_eg)}</div>
 
-    <h2>Cómo se distribuyó</h2>
+    <h2>Distribución del gasto</h2>
     <div class="chart-grid">
       <div class="chart-block">
         <h3>Distribución de egresos por categoría</h3>
@@ -376,7 +370,6 @@ def render_index(infos: list[InformeMes]) -> str:
     cards = []
     for info, cfg in zip(infos, MESES_CONFIG):
         nota_resumen = NARRATIVA.get(info.mes, {}).get('nota_cierre', '')
-        # mostrar resumen sin **markdown** y truncado
         resumen_plano = re.sub(r"\*\*(.+?)\*\*", r"\1", nota_resumen)
         if len(resumen_plano) > 140:
             resumen_plano = resumen_plano[:140].rstrip() + "…"
@@ -395,9 +388,9 @@ def render_index(infos: list[InformeMes]) -> str:
 
     body = f"""
     <p class="lead">
-      Este portal muestra de manera <strong>abierta y verificable</strong> cómo
-      ingresa y sale el dinero de la agrupación durante el ciclo 2026-1.
-      Cada egreso indica <strong>en qué se usó</strong> y <strong>a quién benefició</strong>.
+      Este portal presenta de manera <strong>abierta y verificable</strong> el
+      movimiento financiero de la agrupación durante el ciclo 2026-1. Cada
+      egreso incluye una descripción del concepto correspondiente.
     </p>
 
     <h2>Visión del ciclo</h2>
@@ -441,7 +434,6 @@ def main():
     infos = []
     for cfg in MESES_CONFIG:
         xlsx_path = DATA_DIR / cfg["xlsx"]
-        # copiar xlsx fuente a site/downloads para que sea descargable
         shutil.copy2(xlsx_path, downloads_dir / cfg["xlsx"])
         info = cargar_mes(str(xlsx_path), cfg["mes"])
         infos.append(info)
@@ -455,7 +447,6 @@ def main():
     print(f"OK -> site/index.html")
     print(f"OK -> site/downloads/  ({len(MESES_CONFIG)} archivos)")
 
-    # Cuadre
     print("\n=== Cuadre ===")
     for info in infos:
         print(f"{info.mes:6s}  Ingresos: {fmt_soles(info.ingresos)}  "
