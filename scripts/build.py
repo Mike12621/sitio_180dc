@@ -1,5 +1,6 @@
 """
 build.py — Genera el sitio estático del Portal de Transparencia 180DC PUCP.
+Diseño: editorial financial report.
 """
 from __future__ import annotations
 import sys
@@ -24,6 +25,13 @@ import math
 
 _MD_BOLD = re.compile(r"\*\*(.+?)\*\*", re.DOTALL)
 
+# Mes a abreviatura corta para fechas
+_MES_ABREV = {
+    "01": "Ene", "02": "Feb", "03": "Mar", "04": "Abr", "05": "May",
+    "06": "Jun", "07": "Jul", "08": "Ago", "09": "Set", "10": "Oct",
+    "11": "Nov", "12": "Dic",
+}
+
 def esc(s):
     if s is None:
         return ""
@@ -32,12 +40,36 @@ def esc(s):
 def md(s):
     return _MD_BOLD.sub(r"<strong>\1</strong>", esc(s))
 
-def svg_donut(labels, values, colores, total_label, size=260):
+def fmt_fecha_corta(fecha_str):
+    """'24/03/2026' -> '24 Mar' · '13/03/2026 - 18/03/2026' -> '13–18 Mar'"""
+    if not fecha_str:
+        return ""
+    s = str(fecha_str).strip()
+    # rango
+    if "-" in s and s.count("/") >= 4:
+        parts = [p.strip() for p in s.split("-")]
+        try:
+            d1, m1, _ = parts[0].split("/")
+            d2, m2, _ = parts[1].split("/")
+            if m1 == m2:
+                return f"{int(d1)}–{int(d2)} {_MES_ABREV.get(m1, m1)}"
+            return f"{int(d1)} {_MES_ABREV.get(m1, m1)}–{int(d2)} {_MES_ABREV.get(m2, m2)}"
+        except Exception:
+            return s
+    # individual
+    parts = s.split("/")
+    if len(parts) == 3:
+        d, m, _ = parts
+        return f"{int(d)} {_MES_ABREV.get(m, m)}"
+    return s
+
+
+def svg_donut(labels, values, colores, total_label, size=240):
     if not values or sum(values) == 0:
-        return '<div class="chart-empty">Sin datos</div>'
+        return '<div class="chart-empty">Sin datos para mostrar</div>'
     total = sum(values)
     cx, cy = size/2, size/2
-    r_out, r_in = size*0.42, size*0.42*0.62
+    r_out, r_in = size*0.42, size*0.42*0.66
     paths = []
     start = -math.pi/2
     for v, c in zip(values, colores):
@@ -52,30 +84,33 @@ def svg_donut(labels, values, colores, total_label, size=260):
              f"A {r_out:.2f} {r_out:.2f} 0 {large} 1 {x2:.2f} {y2:.2f} "
              f"L {x3:.2f} {y3:.2f} "
              f"A {r_in:.2f} {r_in:.2f} 0 {large} 0 {x4:.2f} {y4:.2f} Z")
-        paths.append(f'<path d="{d}" fill="{c}" stroke="white" stroke-width="2"/>')
+        paths.append(f'<path d="{d}" fill="{c}"/>')
         start = end
     legend_rows = []
     for lbl, v, c in zip(labels, values, colores):
         pct = v/total*100
         legend_rows.append(
-            f'<li><span class="dot" style="background:{c}"></span>'
+            f'<li>'
+            f'<span class="dot" style="background:{c}"></span>'
             f'<span class="lbl">{esc(lbl)}</span>'
-            f'<span class="val">{fmt_soles(v)} <em>· {pct:.0f}%</em></span></li>'
+            f'<span class="pct">{pct:.0f}%</span>'
+            f'<span class="val">{fmt_soles(v)}</span>'
+            f'</li>'
         )
     return (
         f'<div class="donut-block">'
-        f'<svg viewBox="0 0 {size} {size}" width="100%" height="{size}" preserveAspectRatio="xMidYMid meet">'
+        f'<svg viewBox="0 0 {size} {size}" width="{size}" height="{size}" preserveAspectRatio="xMidYMid meet">'
         f'{"".join(paths)}'
-        f'<text x="{cx}" y="{cy-4}" text-anchor="middle" font-size="11" fill="#6B7280">Total</text>'
-        f'<text x="{cx}" y="{cy+14}" text-anchor="middle" font-size="16" font-weight="700" fill="#1F2937">{total_label}</text>'
+        f'<text x="{cx}" y="{cy-6}" text-anchor="middle" font-size="10" letter-spacing="1" fill="#9CA3AF">TOTAL</text>'
+        f'<text x="{cx}" y="{cy+14}" text-anchor="middle" font-size="18" font-weight="700" fill="#0A0A0A">{total_label}</text>'
         f'</svg>'
         f'<ul class="donut-legend">{"".join(legend_rows)}</ul>'
         f'</div>'
     )
 
 
-def svg_barras(labels, values, colores, width=420, height=260):
-    pad_l, pad_r, pad_t, pad_b = 44, 16, 20, 40
+def svg_barras(labels, values, colores, width=420, height=240):
+    pad_l, pad_r, pad_t, pad_b = 48, 12, 24, 44
     w = width - pad_l - pad_r
     h = height - pad_t - pad_b
     max_v = max(values) if values else 1
@@ -85,7 +120,7 @@ def svg_barras(labels, values, colores, width=420, height=260):
     step = next((s for s in step_candidates if max_v/s <= 5), max_v)
     nice = math.ceil(max_v / step) * step
     n = len(values)
-    bw = w / n * 0.5
+    bw = w / n * 0.45
     gap = w / n
     bars = []
     labels_x = []
@@ -94,13 +129,13 @@ def svg_barras(labels, values, colores, width=420, height=260):
         bh = (v / nice) * h if nice > 0 else 0
         y = pad_t + h - bh
         bars.append(
-            f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{bh:.1f}" rx="6" fill="{c}"/>'
+            f'<rect x="{x:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{bh:.1f}" rx="3" fill="{c}"/>'
             f'<text x="{x + bw/2:.1f}" y="{y - 8:.1f}" text-anchor="middle" '
-            f'font-size="12" font-weight="700" fill="#1F2937">{fmt_soles(v)}</text>'
+            f'font-size="11" font-weight="700" fill="#0A0A0A">{fmt_soles(v)}</text>'
         )
         labels_x.append(
-            f'<text x="{x + bw/2:.1f}" y="{pad_t + h + 22:.1f}" text-anchor="middle" '
-            f'font-size="12" fill="#4B5563" font-weight="500">{esc(lbl)}</text>'
+            f'<text x="{x + bw/2:.1f}" y="{pad_t + h + 24:.1f}" text-anchor="middle" '
+            f'font-size="11" fill="#6B7280" font-weight="500" letter-spacing="0.3">{esc(lbl)}</text>'
         )
     yticks = []
     for k in range(5):
@@ -108,30 +143,53 @@ def svg_barras(labels, values, colores, width=420, height=260):
         y = pad_t + h - (val/nice)*h
         yticks.append(
             f'<line x1="{pad_l}" y1="{y:.1f}" x2="{pad_l+w}" y2="{y:.1f}" '
-            f'stroke="#E5E7EB" stroke-dasharray="2,3"/>'
-            f'<text x="{pad_l-8}" y="{y+3:.1f}" text-anchor="end" font-size="10" fill="#9CA3AF">S/ {val:.0f}</text>'
+            f'stroke="#F3F4F6"/>'
+            f'<text x="{pad_l-8}" y="{y+3:.1f}" text-anchor="end" font-size="10" fill="#9CA3AF">{val:.0f}</text>'
         )
+    # eje base
+    yticks.append(f'<line x1="{pad_l}" y1="{pad_t+h:.1f}" x2="{pad_l+w}" y2="{pad_t+h:.1f}" stroke="#D1D5DB"/>')
     return (
         f'<svg viewBox="0 0 {width} {height}" width="100%" preserveAspectRatio="xMidYMid meet">'
+        f'<text x="{pad_l-32}" y="{pad_t-8}" font-size="10" fill="#9CA3AF" letter-spacing="1">S/</text>'
         f'{"".join(yticks)}{"".join(bars)}{"".join(labels_x)}'
         f'</svg>'
     )
 
+
+def brand_mark():
+    """SVG inline del 'globo' rayado de 180DC en verde."""
+    return (
+        '<svg class="brand-mark" viewBox="0 0 32 32" width="28" height="28" '
+        'xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+        '<circle cx="16" cy="16" r="15" fill="none" stroke="#7AB929" stroke-width="1.5"/>'
+        '<path d="M 4 11 Q 16 7 28 11" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/>'
+        '<path d="M 3 16 Q 16 12 29 16" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/>'
+        '<path d="M 4 21 Q 16 25 28 21" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/>'
+        '</svg>'
+    )
+
+
 def nav_html(slug_actual=None):
-    items = ['<a href="../index.html"' + (' class="active"' if slug_actual is None else '') + '>Inicio</a>']
+    items = []
+    items.append(
+        f'<a href="../index.html"{" class=\"active\"" if slug_actual is None else ""}>Inicio</a>'
+    )
     for m in MESES_CONFIG:
         cls = ' class="active"' if m["slug"] == slug_actual else ""
-        items.append(f'<a href="{m["slug"]}.html"{cls}>{m["mes"]} 2026-1</a>')
-    return f'<nav>{"".join(items)}</nav>'
+        items.append(f'<a href="{m["slug"]}.html"{cls}>{m["mes"]}</a>')
+    return f'<nav class="main-nav">{"".join(items)}</nav>'
+
 
 def nav_home():
     items = ['<a class="active" href="index.html">Inicio</a>']
     for m in MESES_CONFIG:
-        items.append(f'<a href="meses/{m["slug"]}.html">{m["mes"]} 2026-1</a>')
-    return f'<nav>{"".join(items)}</nav>'
+        items.append(f'<a href="meses/{m["slug"]}.html">{m["mes"]}</a>')
+    return f'<nav class="main-nav">{"".join(items)}</nav>'
+
 
 def layout(titulo, body, slug_actual=None, asset_prefix="."):
     nav = nav_home() if slug_actual is None else nav_html(slug_actual)
+    home_href = "index.html" if slug_actual is None else "../index.html"
     return f"""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -140,122 +198,175 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
 <title>{esc(titulo)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{asset_prefix}/assets/style.css">
 </head>
 <body>
   <header class="site-header">
-    <div class="wrap">
-      <div class="brand">
+    <div class="header-inner wrap">
+      <a class="brand" href="{home_href}">
+        {brand_mark()}
         <div class="brand-text">
-          <h1>Portal de Transparencia Financiera</h1>
-          <p>180 Degrees Consulting PUCP · Ciclo 2026-1</p>
+          <span class="brand-name">180DC PUCP</span>
+          <span class="brand-sub">Transparencia financiera</span>
         </div>
-      </div>
+      </a>
       {nav}
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span>Ciclo 2026-1</span>
+      </div>
     </div>
   </header>
   <main class="wrap">
     {body}
   </main>
   <footer>
-    <div class="wrap">
-      <p><strong>180 Degrees Consulting PUCP</strong> · Portal de Transparencia Financiera</p>
-      <p class="footer-muted">Generado a partir del Registro de Transacciones mensual del área financiera.</p>
+    <div class="wrap footer-inner">
+      <div>
+        <p class="footer-title">180 Degrees Consulting PUCP</p>
+        <p class="footer-sub">Portal de Transparencia Financiera · Ciclo 2026-1</p>
+      </div>
+      <div class="footer-meta">
+        <p>Información derivada del Registro de Transacciones mensual.</p>
+        <p>Consultas: área financiera.</p>
+      </div>
     </div>
   </footer>
 </body>
 </html>
 """
 
+
+# =============================================================================
+# Componente: fila de transacción
+# =============================================================================
+def render_fila(*, titulo, monto, fecha, categoria, descripcion, tipo,
+                badge_txt=None):
+    """tipo: 'in' | 'op' | 'inv'"""
+    signo = "+" if tipo == "in" else "−"
+    monto_cls = {"in": "in", "op": "op", "inv": "inv"}[tipo]
+    badge_html = ""
+    if badge_txt:
+        badge_html = f'<span class="row-badge {monto_cls}">{esc(badge_txt)}</span>'
+    fecha_corta = fmt_fecha_corta(fecha)
+    meta_parts = []
+    if badge_html:
+        meta_parts.append(badge_html)
+    if fecha_corta:
+        meta_parts.append(f'<span class="row-meta-item">{esc(fecha_corta)}</span>')
+    if categoria:
+        meta_parts.append(f'<span class="row-meta-item">{esc(categoria)}</span>')
+    meta_html = ('<div class="row-meta">'
+                 + '<span class="row-sep"></span>'.join(meta_parts)
+                 + '</div>') if meta_parts else ""
+    return f"""
+    <article class="tx-row tx-{monto_cls}">
+      <div class="tx-main">
+        <div class="tx-head">
+          <h4 class="tx-title">{esc(titulo)}</h4>
+          <div class="tx-monto {monto_cls}">{signo} {fmt_soles(monto)}</div>
+        </div>
+        {meta_html}
+        <p class="tx-desc">{esc(descripcion)}</p>
+      </div>
+    </article>
+    """
+
+
 # =============================================================================
 # Página mes
 # =============================================================================
 def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str) -> str:
-    kpis_html = f"""
-    <div class="kpis">
-      <div class="kpi"><div class="label">Saldo inicial</div><div class="value">{fmt_soles(info.saldo_inicial)}</div></div>
-      <div class="kpi verde"><div class="label">Ingresos</div><div class="value">{fmt_soles(info.ingresos)}</div></div>
-      <div class="kpi rojo"><div class="label">Egresos operativos</div><div class="value">{fmt_soles(info.egresos_op)}</div></div>
-      <div class="kpi ambar"><div class="label">Inversión IME</div><div class="value">{fmt_soles(info.inversion)}</div></div>
-      <div class="kpi azul"><div class="label">Saldo final</div><div class="value">{fmt_soles(info.saldo_final)}</div></div>
-    </div>
-    """
+    # delta de saldo
+    delta = info.saldo_final - info.saldo_inicial
+    delta_sign = "+" if delta >= 0 else "−"
+    delta_cls = "up" if delta >= 0 else "down"
 
-    ecuacion_html = f"""
-    <div class="ecuacion">
-      <p class="ecuacion-titulo">Cálculo del saldo final</p>
-      <div class="form">
-        <span class="op-val">{fmt_soles(info.saldo_inicial)}</span>
-        <span class="op-sign verde">+</span>
-        <span class="op-val">{fmt_soles(info.ingresos)}</span>
-        <span class="op-sign rojo">−</span>
-        <span class="op-val">{fmt_soles(info.egresos_op)}</span>
-        <span class="op-sign ambar">−</span>
-        <span class="op-val">{fmt_soles(info.inversion)}</span>
-        <span class="op-sign">=</span>
-        <span class="op-result">{fmt_soles(info.saldo_final)}</span>
+    # ---- Hero saldo
+    hero_saldo = f"""
+    <section class="hero-saldo">
+      <div class="hero-saldo-main">
+        <p class="eyebrow">Saldo final del mes</p>
+        <div class="hero-saldo-num">{fmt_soles(info.saldo_final)}</div>
+        <p class="hero-saldo-delta {delta_cls}">
+          <span class="arrow">{'↑' if delta >= 0 else '↓'}</span>
+          {delta_sign} {fmt_soles(abs(delta))} vs. saldo inicial
+        </p>
       </div>
-      <p class="ecuacion-leyenda">Saldo inicial + Ingresos − Egresos operativos − Inversión</p>
+      <div class="hero-saldo-calc">
+        <p class="eyebrow">Cálculo</p>
+        <dl class="calc-list">
+          <div><dt>Saldo inicial</dt><dd>{fmt_soles(info.saldo_inicial)}</dd></div>
+          <div class="op"><dt><span class="op-sign verde">+</span> Ingresos</dt><dd>{fmt_soles(info.ingresos)}</dd></div>
+          <div class="op"><dt><span class="op-sign rojo">−</span> Egresos operativos</dt><dd>{fmt_soles(info.egresos_op)}</dd></div>
+          <div class="op"><dt><span class="op-sign ambar">−</span> Inversión IME</dt><dd>{fmt_soles(info.inversion)}</dd></div>
+          <div class="total"><dt>Saldo final</dt><dd>{fmt_soles(info.saldo_final)}</dd></div>
+        </dl>
+      </div>
+    </section>
+    """
+
+    # ---- Stat strip
+    stat_strip = f"""
+    <div class="stat-strip">
+      <div class="stat">
+        <span class="stat-label">Saldo inicial</span>
+        <span class="stat-value">{fmt_soles(info.saldo_inicial)}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Ingresos</span>
+        <span class="stat-value verde">{fmt_soles(info.ingresos)}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Egresos operativos</span>
+        <span class="stat-value rojo">{fmt_soles(info.egresos_op)}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Inversión IME</span>
+        <span class="stat-value ambar">{fmt_soles(info.inversion)}</span>
+      </div>
     </div>
     """
 
-    info_box = ""
-    if info.inversion > 0:
-        info_box = """
-        <div class="info-box">
-          <strong>Sobre la Inversión IME:</strong>
-          A diferencia de un gasto operativo —que se consume durante el mes—
-          una inversión corresponde a bienes durables que permanecen como
-          activo de la agrupación y se reutilizan en ciclos posteriores
-          (polos institucionales, photochecks, equipamiento). Se reporta
-          separada para no distorsionar el resultado operativo del mes.
-        </div>
-        """
-
+    # ---- Ingresos
     fuentes = narrativa.get("fuentes_ingresos", [])
-    cards_ingreso = []
+    filas_ingreso = []
     for f in fuentes:
-        cards_ingreso.append(f"""
-        <article class="card ingreso">
-          <div class="top">
-            <h3>{esc(f['nombre'])}</h3>
-            <div class="monto">+ {fmt_soles(f['monto'])}</div>
-          </div>
-          <p class="card-text">{esc(f.get('detalle',''))}</p>
-        </article>
-        """)
-    if not cards_ingreso:
-        cards_ingreso.append('<p class="muted">No se registran fuentes de ingreso descritas para este mes.</p>')
+        filas_ingreso.append(render_fila(
+            titulo=f['nombre'],
+            monto=f['monto'],
+            fecha=f.get('fecha', ''),
+            categoria='',
+            descripcion=f.get('detalle', ''),
+            tipo='in',
+            badge_txt='Ingreso',
+        ))
+    if not filas_ingreso:
+        filas_ingreso.append('<p class="muted">No se registran ingresos en el mes.</p>')
 
-    egresos_cfg = narrativa.get("egresos", [])
-    egresos_cfg = sorted(egresos_cfg, key=lambda e: e["monto"], reverse=True)
-    cards_eg = []
+    # ---- Egresos
+    egresos_cfg = sorted(narrativa.get("egresos", []), key=lambda e: e["monto"], reverse=True)
+    filas_egreso = []
     for e in egresos_cfg:
-        cls = "inversion" if e.get("es_inversion") else ""
-        badge_cls = "inv" if e.get("es_inversion") else "op"
-        badge_txt = "Inversión IME" if e.get("es_inversion") else "Operativo"
-        cards_eg.append(f"""
-        <article class="card {cls}">
-          <div class="top">
-            <div class="top-info">
-              <h3>{esc(e['titulo'])}</h3>
-              <div class="meta">
-                <span class="badge {badge_cls}">{badge_txt}</span>
-                <span class="meta-sep">·</span>
-                <span>{esc(e.get('fecha',''))}</span>
-                <span class="meta-sep">·</span>
-                <span>{esc(e.get('categoria_ui',''))}</span>
-              </div>
-            </div>
-            <div class="monto">− {fmt_soles(e['monto'])}</div>
-          </div>
-          <p class="card-text">{esc(e.get('para_que',''))}</p>
-        </article>
-        """)
-    if not cards_eg:
-        cards_eg.append('<p class="muted">No hubo egresos descritos en el mes.</p>')
+        tipo = 'inv' if e.get('es_inversion') else 'op'
+        badge = 'Inversión IME' if e.get('es_inversion') else 'Operativo'
+        filas_egreso.append(render_fila(
+            titulo=e['titulo'],
+            monto=e['monto'],
+            fecha=e.get('fecha', ''),
+            categoria=e.get('categoria_ui', ''),
+            descripcion=e.get('para_que', ''),
+            tipo=tipo,
+            badge_txt=badge,
+        ))
+    if not filas_egreso:
+        filas_egreso.append('<p class="muted">No se registran egresos en el mes.</p>')
 
+    # ---- Subtotal headers
+    egresos_total = info.egresos_op + info.inversion
+
+    # ---- Charts
     dist = {}
     for e in egresos_cfg:
         c = e.get("categoria_ui", "Otros")
@@ -263,65 +374,116 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
     dist_items = sorted(dist.items(), key=lambda x: x[1], reverse=True)
     dist_labels = [k for k,_ in dist_items]
     dist_data = [v for _,v in dist_items]
-    colores = ["#7AB929", "#1F2937", "#F59E0B", "#3B82F6", "#EF4444", "#6B7280", "#8B5CF6"]
-    color_list = [colores[i % len(colores)] for i in range(len(dist_labels))]
+    paleta = ["#7AB929", "#1F2937", "#F59E0B", "#3B82F6", "#DC2626", "#8B5CF6", "#6B7280"]
+    color_list = [paleta[i % len(paleta)] for i in range(len(dist_labels))]
     donut_svg = svg_donut(dist_labels, dist_data, color_list,
                           fmt_soles(sum(dist_data)) if dist_data else "S/ 0")
 
     cmp_labels = ["Ingresos", "Egresos op.", "Inversión"]
     cmp_values = [info.ingresos, info.egresos_op, info.inversion]
-    cmp_colors = ["#7AB929", "#EF4444", "#F59E0B"]
+    cmp_colors = ["#7AB929", "#DC2626", "#F59E0B"]
     barras_svg = svg_barras(cmp_labels, cmp_values, cmp_colors)
 
+    # ---- Análisis (pull-quote style)
     nota = narrativa.get("nota_cierre", "")
-    cierre_html = f'<section class="cierre"><h3 class="section-title">Análisis del mes</h3><p>{md(nota)}</p></section>' if nota else ""
+    cierre_html = ""
+    if nota:
+        cierre_html = f"""
+        <section class="analisis-section">
+          <p class="section-eyebrow">Análisis</p>
+          <h3 class="section-title-big">Comentario del mes</h3>
+          <blockquote class="pullquote">{md(nota)}</blockquote>
+        </section>
+        """
 
+    # ---- Descarga
     descarga_html = f"""
     <div class="descarga">
       <div class="descarga-info">
-        <strong>Archivo fuente del mes</strong>
-        <p>Toda la información proviene del Registro de Transacciones
-           contable. Descárgalo para verificar línea por línea.</p>
+        <p class="eyebrow">Archivo fuente</p>
+        <h4>Registro de Transacciones — {info.mes} {info.ciclo}</h4>
+        <p>Verifica línea por línea. Los datos del informe se generan
+           automáticamente a partir de este archivo.</p>
       </div>
       <a class="btn-descarga" href="../downloads/{esc(xlsx_filename)}" download>
-        Descargar Excel
+        <span>Descargar Excel</span>
         <span class="btn-arrow">↓</span>
       </a>
     </div>
     """
 
+    # ---- Info box inversión
+    info_box_inv = ""
+    if info.inversion > 0:
+        info_box_inv = """
+        <div class="info-box">
+          <strong>Inversión IME</strong>
+          Compras de bienes durables que permanecen como activo de la
+          agrupación (polos institucionales, photochecks, equipamiento)
+          y se reutilizan en ciclos siguientes. Se reporta separada del
+          gasto operativo para no distorsionar el resultado del mes.
+        </div>
+        """
+
     body = f"""
-    <section class="page-header">
-      <h2>{info.mes} {info.ciclo}</h2>
-      <p class="page-meta">Responsable: <strong>{esc(info.responsable)}</strong> · Última actualización: <strong>{esc(info.actualizacion)}</strong></p>
+    <div class="breadcrumb">
+      <a href="../index.html">Inicio</a>
+      <span class="bc-sep">/</span>
+      <span>{info.mes} 2026-1</span>
+    </div>
+
+    <header class="page-hero">
+      <p class="eyebrow">Ciclo 2026-1 · Reporte mensual</p>
+      <h1 class="page-title">{info.mes}</h1>
+      <p class="page-meta">
+        Responsable de actualización: <strong>{esc(info.responsable)}</strong>
+        <span class="meta-sep">·</span>
+        Última actualización: <strong>{esc(info.actualizacion)}</strong>
+      </p>
+    </header>
+
+    {hero_saldo}
+    {stat_strip}
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Movimientos</p>
+          <h3 class="section-title-big">Ingresos del mes</h3>
+        </div>
+        <div class="section-total verde">
+          <span class="total-label">Total</span>
+          <span class="total-value">+ {fmt_soles(info.ingresos)}</span>
+        </div>
+      </div>
+      <div class="tx-list">{''.join(filas_ingreso)}</div>
     </section>
 
-    <section>
-      <h3 class="section-title">Resumen del mes</h3>
-      {kpis_html}
-      {ecuacion_html}
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Movimientos</p>
+          <h3 class="section-title-big">Egresos del mes</h3>
+        </div>
+        <div class="section-total rojo">
+          <span class="total-label">Total</span>
+          <span class="total-value">− {fmt_soles(egresos_total)}</span>
+        </div>
+      </div>
+      {info_box_inv}
+      <div class="tx-list">{''.join(filas_egreso)}</div>
     </section>
 
-    <section>
-      <h3 class="section-title">Ingresos</h3>
-      <div class="cards">{''.join(cards_ingreso)}</div>
-    </section>
-
-    <section>
-      <h3 class="section-title">Egresos</h3>
-      {info_box}
-      <div class="cards">{''.join(cards_eg)}</div>
-    </section>
-
-    <section>
-      <h3 class="section-title">Distribución</h3>
+    <section class="section">
+      <p class="section-eyebrow">Visualización</p>
+      <h3 class="section-title-big">Distribución del gasto</h3>
       <div class="chart-grid">
         <div class="chart-block">
-          <h4>Egresos por categoría</h4>
+          <h4 class="chart-title">Egresos por categoría</h4>
           {donut_svg}
         </div>
         <div class="chart-block">
-          <h4>Comparativo del mes</h4>
+          <h4 class="chart-title">Comparativo del mes</h4>
           {barras_svg}
         </div>
       </div>
@@ -329,13 +491,15 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
 
     {cierre_html}
 
-    <section>
-      <h3 class="section-title">Datos abiertos</h3>
+    <section class="section">
+      <p class="section-eyebrow">Verificación</p>
+      <h3 class="section-title-big">Datos abiertos</h3>
       {descarga_html}
     </section>
     """
     return layout(f"{info.mes} 2026-1 · 180DC PUCP", body,
                   slug_actual=slug, asset_prefix="..")
+
 
 # =============================================================================
 # Página índice
@@ -346,80 +510,156 @@ def render_index(infos: list[InformeMes]) -> str:
     total_inv = sum(i.inversion for i in infos)
     saldo_inicio = infos[0].saldo_inicial if infos else 0
     saldo_actual = infos[-1].saldo_final if infos else 0
+    delta_ciclo = saldo_actual - saldo_inicio
+    delta_sign = "+" if delta_ciclo >= 0 else "−"
+    delta_cls = "up" if delta_ciclo >= 0 else "down"
 
-    kpis = f"""
-    <div class="kpis">
-      <div class="kpi"><div class="label">Saldo de inicio</div><div class="value">{fmt_soles(saldo_inicio)}</div></div>
-      <div class="kpi verde"><div class="label">Ingresos acumulados</div><div class="value">{fmt_soles(total_ing)}</div></div>
-      <div class="kpi rojo"><div class="label">Egresos operativos</div><div class="value">{fmt_soles(total_eg)}</div></div>
-      <div class="kpi ambar"><div class="label">Inversión acumulada</div><div class="value">{fmt_soles(total_inv)}</div></div>
-      <div class="kpi azul"><div class="label">Saldo actual</div><div class="value">{fmt_soles(saldo_actual)}</div></div>
+    # ---- Hero
+    hero = f"""
+    <section class="index-hero">
+      <p class="eyebrow">180 Degrees Consulting PUCP</p>
+      <h1 class="hero-title">Reporte de transparencia financiera</h1>
+      <p class="hero-lead">
+        Movimiento financiero detallado de la agrupación durante el ciclo
+        académico 2026-1. Cada transacción cuenta con su descripción y el
+        archivo fuente está disponible para verificación.
+      </p>
+      <div class="hero-saldo-strip">
+        <div>
+          <p class="eyebrow">Saldo actual</p>
+          <div class="hero-saldo-big">{fmt_soles(saldo_actual)}</div>
+          <p class="hero-saldo-delta {delta_cls}">
+            <span class="arrow">{'↑' if delta_ciclo >= 0 else '↓'}</span>
+            {delta_sign} {fmt_soles(abs(delta_ciclo))} desde el inicio del ciclo
+          </p>
+        </div>
+      </div>
+    </section>
+    """
+
+    # ---- Stat strip
+    stat_strip = f"""
+    <div class="stat-strip stat-strip-index">
+      <div class="stat">
+        <span class="stat-label">Saldo de inicio</span>
+        <span class="stat-value">{fmt_soles(saldo_inicio)}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Ingresos acumulados</span>
+        <span class="stat-value verde">{fmt_soles(total_ing)}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Egresos operativos</span>
+        <span class="stat-value rojo">{fmt_soles(total_eg)}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Inversión IME</span>
+        <span class="stat-value ambar">{fmt_soles(total_inv)}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Meses reportados</span>
+        <span class="stat-value">{len(infos)}</span>
+      </div>
     </div>
     """
 
+    # ---- Month cards
     cards = []
-    for info, cfg in zip(infos, MESES_CONFIG):
-        nota_resumen = NARRATIVA.get(info.mes, {}).get('nota_cierre', '')
-        resumen_plano = re.sub(r"\*\*(.+?)\*\*", r"\1", nota_resumen)
-        if len(resumen_plano) > 160:
-            resumen_plano = resumen_plano[:160].rstrip() + "…"
+    for idx, (info, cfg) in enumerate(zip(infos, MESES_CONFIG), 1):
+        delta_mes = info.saldo_final - info.saldo_inicial
+        d_sign = "+" if delta_mes >= 0 else "−"
+        d_cls = "up" if delta_mes >= 0 else "down"
         cards.append(f"""
         <a class="mes-card" href="meses/{cfg['slug']}.html">
           <div class="mes-card-head">
-            <span class="mes-label">{info.mes} 2026-1</span>
+            <div>
+              <p class="eyebrow">Mes {idx:02d} · 2026-1</p>
+              <h3 class="mes-card-title">{info.mes}</h3>
+            </div>
             <span class="mes-arrow">→</span>
           </div>
-          <p class="resumen">{esc(resumen_plano)}</p>
-          <div class="stats">
-            <div><span>Ingresos</span><b>{fmt_soles(info.ingresos)}</b></div>
-            <div><span>Egresos</span><b>{fmt_soles(info.egresos_op + info.inversion)}</b></div>
-            <div><span>Saldo final</span><b>{fmt_soles(info.saldo_final)}</b></div>
+          <div class="mes-card-saldo">
+            <p class="eyebrow">Saldo final</p>
+            <div class="mes-saldo-num">{fmt_soles(info.saldo_final)}</div>
+            <p class="mes-delta {d_cls}">
+              <span class="arrow">{'↑' if delta_mes >= 0 else '↓'}</span>
+              {d_sign} {fmt_soles(abs(delta_mes))}
+            </p>
+          </div>
+          <div class="mes-card-stats">
+            <div>
+              <span>Ingresos</span>
+              <b class="verde">+ {fmt_soles(info.ingresos)}</b>
+            </div>
+            <div>
+              <span>Egresos op.</span>
+              <b class="rojo">− {fmt_soles(info.egresos_op)}</b>
+            </div>
+            <div>
+              <span>Inversión</span>
+              <b class="ambar">− {fmt_soles(info.inversion)}</b>
+            </div>
           </div>
         </a>
         """)
 
     body = f"""
-    <section class="hero">
-      <h2>Información financiera abierta y verificable</h2>
-      <p>
-        Este portal reporta mes a mes el movimiento financiero de la
-        agrupación durante el ciclo 2026-1. Cada movimiento contable cuenta
-        con su descripción correspondiente y el archivo fuente está
-        disponible para descarga.
-      </p>
-    </section>
+    {hero}
+    {stat_strip}
 
-    <section>
-      <h3 class="section-title">Indicadores acumulados del ciclo</h3>
-      {kpis}
-      <div class="info-box">
-        <strong>Sobre la Inversión IME:</strong>
-        Separamos del gasto regular las compras de bienes durables que se
-        mantienen como activo de la agrupación y se reutilizan en ciclos
-        posteriores (polos, photochecks, equipamiento). Esto evita que un
-        mes con compras de inventario aparezca como deficitario.
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Reportes</p>
+          <h3 class="section-title-big">Informes mensuales</h3>
+        </div>
       </div>
-    </section>
-
-    <section>
-      <h3 class="section-title">Informes mensuales</h3>
       <div class="meses-grid">{''.join(cards)}</div>
     </section>
 
-    <section>
-      <h3 class="section-title">Metodología</h3>
-      <p class="prose">
-        Los montos provienen directamente del <em>Registro de Transacciones</em>
-        mensual que mantiene el área financiera. Cada movimiento del archivo
-        contable original tiene su correlativo en el portal. El archivo fuente
-        de cada mes puede descargarse desde su página correspondiente para
-        verificación línea por línea. Para consultas adicionales, comunícate
-        con el área financiera.
-      </p>
+    <section class="section two-col">
+      <div>
+        <p class="section-eyebrow">Marco contable</p>
+        <h3 class="section-title-big">Metodología</h3>
+        <p class="prose">
+          Los montos provienen directamente del <em>Registro de Transacciones</em>
+          mensual que mantiene el área financiera. Cada movimiento del archivo
+          contable original tiene su correlativo en el portal, y el archivo
+          fuente de cada mes está disponible para descarga, lo cual permite
+          verificación línea por línea.
+        </p>
+        <p class="prose">
+          Para consultas adicionales o detalle complementario, comunícate con
+          el área financiera de la agrupación.
+        </p>
+      </div>
+      <div>
+        <p class="section-eyebrow">Definiciones</p>
+        <h3 class="section-title-big">Conceptos clave</h3>
+        <dl class="def-list">
+          <div>
+            <dt>Ingresos</dt>
+            <dd>Fondos que entran a caja en el mes (membresías, donaciones, recaudaciones, patrocinios).</dd>
+          </div>
+          <div>
+            <dt>Egresos operativos</dt>
+            <dd>Consumibles del mes: bocaditos, transporte, ITF, capacitaciones, integración.</dd>
+          </div>
+          <div>
+            <dt>Inversión IME</dt>
+            <dd>Inventario / material reutilizable. Bienes durables que permanecen como activo de la agrupación.</dd>
+          </div>
+          <div>
+            <dt>Saldo final</dt>
+            <dd>Saldo inicial + Ingresos − Egresos operativos − Inversión.</dd>
+          </div>
+        </dl>
+      </div>
     </section>
     """
-    return layout("180DC PUCP · Portal de Transparencia Financiera", body,
+    return layout("180DC PUCP · Transparencia Financiera", body,
                   slug_actual=None, asset_prefix=".")
+
 
 # =============================================================================
 # Main
@@ -453,6 +693,7 @@ def main():
               f"Egresos op.: {fmt_soles(info.egresos_op)}  "
               f"Inv: {fmt_soles(info.inversion)}  "
               f"Saldo final: {fmt_soles(info.saldo_final)}")
+
 
 if __name__ == "__main__":
     main()
