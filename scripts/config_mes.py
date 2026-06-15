@@ -112,8 +112,91 @@ ABRIL = {
     ),
 }
 
+# Mayo 2026-1 -----------------------------------------------------------------
+MAYO = {
+    "fuentes_ingresos": [],
+    "egresos": [
+        {
+            "titulo": "Premio rifa de febrero (1ro)",
+            "monto": 37.00,
+            "fecha": "10/05/2026",
+            "para_que": "Entrega de primer premio de la rifa pro fondos realizada en febrero.",
+            "categoria_ui": "Rifas — Premios",
+            "es_inversion": False,
+            "icono": "🎟️",
+        },
+        {
+            "titulo": "Premio rifa de febrero (2do)",
+            "monto": 17.00,
+            "fecha": "10/05/2026",
+            "para_que": "Entrega de segundo premio de la rifa pro fondos realizada en febrero.",
+            "categoria_ui": "Rifas — Premios",
+            "es_inversion": False,
+            "icono": "🎟️",
+        },
+        {
+            "titulo": "Premio rifa de febrero (3ro)",
+            "monto": 9.50,
+            "fecha": "10/05/2026",
+            "para_que": "Entrega de tercer premio de la rifa pro fondos realizada en febrero.",
+            "categoria_ui": "Rifas — Premios",
+            "es_inversion": False,
+            "icono": "🎟️",
+        },
+    ],
+    "nota_cierre": (
+        "Mayo fue un mes **sin ingresos** y con un único concepto de gasto: "
+        "la entrega de los tres premios pendientes de la rifa pro fondos del "
+        "mes de febrero (S/ 37 + S/ 17 + S/ 9.50 = S/ 63.50). El saldo baja "
+        "ligeramente pero se mantiene sólido."
+    ),
+}
+
+# Junio 2026-1 ----------------------------------------------------------------
+JUNIO = {
+    "fuentes_ingresos": [],
+    "egresos": [
+        {
+            "titulo": "Reserva de nombre",
+            "monto": 26.40,
+            "fecha": "01/06/2026",
+            "para_que": "Pago por reserva de nombre ante SUNARP como parte del proceso de constitución de la agrupación.",
+            "categoria_ui": "Constitución",
+            "es_inversion": False,
+            "icono": "📋",
+        },
+        {
+            "titulo": "Costos registrales",
+            "monto": 130.00,
+            "fecha": "05/06/2026",
+            "para_que": "Costos registrales asociados al proceso de constitución formal de la agrupación.",
+            "categoria_ui": "Constitución",
+            "es_inversion": False,
+            "icono": "🏛️",
+        },
+        {
+            "titulo": "Costos notariales",
+            "monto": 821.50,
+            "fecha": "10/06/2026",
+            "para_que": "Honorarios notariales para la escritura pública de constitución de la agrupación.",
+            "categoria_ui": "Constitución",
+            "es_inversion": False,
+            "icono": "⚖️",
+        },
+    ],
+    "nota_cierre": (
+        "Junio concentra el **gasto más importante del ciclo**: la constitución "
+        "formal de 180DC PUCP como persona jurídica (reserva de nombre, costos "
+        "registrales y notariales por un total de S/ 977.90). No hubo ingresos "
+        "en el mes, y el saldo baja significativamente. Es un gasto estratégico "
+        "y no recurrente que habilita a la agrupación para operar formalmente."
+    ),
+}
+
 # Registro global por mes
 NARRATIVA = {
     "Marzo": MARZO,
     "Abril": ABRIL,
+    "Mayo": MAYO,
+    "Junio": JUNIO,
 }

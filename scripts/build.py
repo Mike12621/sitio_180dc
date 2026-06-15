@@ -18,6 +18,8 @@ DATA_DIR = ROOT / "data"
 MESES_CONFIG = [
     {"mes": "Marzo", "slug": "marzo", "xlsx": "transacciones_marzo.xlsx"},
     {"mes": "Abril", "slug": "abril", "xlsx": "transacciones_abril.xlsx"},
+    {"mes": "Mayo", "slug": "mayo", "xlsx": "transacciones_mayo.xlsx"},
+    {"mes": "Junio", "slug": "junio", "xlsx": "transacciones_junio.xlsx"},
 ]
 
 import re

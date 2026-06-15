@@ -19,6 +19,7 @@ REGLAS_CATEGORIA = [
     (r"capacitaci", "Capacitación"),
     (r"itf|impuesto", "ITF / Impuestos"),
     (r"pizza|integraci", "Integración"),
+    (r"reserva de nombre|registral|notarial|constituci", "Constitución"),
     (r"ruc", "RUC"),
     (r"180 talks|talks", "180 Talks"),
     (r"rifa", "Rifas"),
@@ -257,6 +258,21 @@ GLOSAS = {
         "proposito": (
             "Aporte mensual fijo de S/10 por miembro activo. Es la única "
             "fuente de ingresos regulares de la agrupación en este mes."
+        ),
+    },
+    "Constitución": {
+        "titulo": "Constitución de persona jurídica",
+        "proposito": (
+            "Gastos legales y registrales para la constitución formal de "
+            "180DC PUCP como persona jurídica: reserva de nombre, costos "
+            "registrales y escritura pública notarial."
+        ),
+    },
+    "Rifas — Premios": {
+        "titulo": "Premios de la rifa pro fondos",
+        "proposito": (
+            "Entrega de premios de la rifa de recaudación realizada en "
+            "febrero. Los premios se entregan con posterioridad al sorteo."
         ),
     },
     "RUC": {

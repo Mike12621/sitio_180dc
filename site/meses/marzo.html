@@ -4,193 +4,235 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marzo 2026-1 · 180DC PUCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
   <header class="site-header">
-    <div class="wrap">
-      <h1>180DC PUCP · Portal de Transparencia Financiera</h1>
-      <p>Ciclo académico 2026-1 · Rendición de cuentas mensual</p>
-      <nav><a href="../index.html">Inicio</a><a href="marzo.html" class="active">Marzo 2026-1</a><a href="abril.html">Abril 2026-1</a></nav>
+    <div class="header-inner wrap">
+      <a class="brand" href="../index.html">
+        <svg class="brand-mark" viewBox="0 0 32 32" width="28" height="28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="none" stroke="#7AB929" stroke-width="1.5"/><path d="M 4 11 Q 16 7 28 11" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/><path d="M 3 16 Q 16 12 29 16" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/><path d="M 4 21 Q 16 25 28 21" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <div class="brand-text">
+          <span class="brand-name">180DC PUCP</span>
+          <span class="brand-sub">Transparencia financiera</span>
+        </div>
+      </a>
+      <nav class="main-nav"><a href="../index.html">Inicio</a><a href="marzo.html" class="active">Marzo</a><a href="abril.html">Abril</a><a href="mayo.html">Mayo</a><a href="junio.html">Junio</a></nav>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span>Ciclo 2026-1</span>
+      </div>
     </div>
   </header>
   <main class="wrap">
     
-    <p class="muted">Mes contable: <strong>Marzo 2026-1</strong> ·
-       Responsable de actualización: <strong>Lesly Guzmán</strong> ·
-       Última actualización: <strong>24/04/2026</strong></p>
-
-    <h2>Resumen del mes</h2>
-    
-    <div class="kpis">
-      <div class="kpi"><div class="label">Saldo inicial</div><div class="value">S/ 921.05</div></div>
-      <div class="kpi verde"><div class="label">Ingresos</div><div class="value">S/ 640.00</div></div>
-      <div class="kpi rojo"><div class="label">Egresos operativos</div><div class="value">S/ 193.17</div></div>
-      <div class="kpi ambar"><div class="label">Inversión IME</div><div class="value">S/ 290.00</div></div>
-      <div class="kpi azul"><div class="label">Saldo final</div><div class="value">S/ 1,077.88</div></div>
+    <div class="breadcrumb">
+      <a href="../index.html">Inicio</a>
+      <span class="bc-sep">/</span>
+      <span>Marzo 2026-1</span>
     </div>
-    
-    
-    <div class="ecuacion">
-      <p><strong>Cómo se llegó al saldo final del mes</strong></p>
-      <div class="form">
-        S/ 921.05
-        &nbsp;<span style="color:var(--verde)">+ S/ 640.00</span>
-        &nbsp;<span style="color:var(--rojo)">− S/ 193.17</span>
-        &nbsp;<span style="color:var(--ambar)">− S/ 290.00</span>
-        &nbsp;= <strong>S/ 1,077.88</strong>
-      </div>
-      <p class="muted" style="margin-top:10px">
-        Saldo inicial + Ingresos − Egresos operativos − Inversión = Saldo final
+
+    <header class="page-hero">
+      <p class="eyebrow">Ciclo 2026-1 · Reporte mensual</p>
+      <h1 class="page-title">Marzo</h1>
+      <p class="page-meta">
+        Responsable de actualización: <strong>Lesly Guzmán</strong>
+        <span class="meta-sep">·</span>
+        Última actualización: <strong>24/04/2026</strong>
       </p>
+    </header>
+
+    
+    <section class="hero-saldo">
+      <div class="hero-saldo-main">
+        <p class="eyebrow">Saldo final del mes</p>
+        <div class="hero-saldo-num">S/ 1,077.88</div>
+        <p class="hero-saldo-delta up">
+          <span class="arrow">↑</span>
+          + S/ 156.83 vs. saldo inicial
+        </p>
+      </div>
+      <div class="hero-saldo-calc">
+        <p class="eyebrow">Cálculo</p>
+        <dl class="calc-list">
+          <div><dt>Saldo inicial</dt><dd>S/ 921.05</dd></div>
+          <div class="op"><dt><span class="op-sign verde">+</span> Ingresos</dt><dd>S/ 640.00</dd></div>
+          <div class="op"><dt><span class="op-sign rojo">−</span> Egresos operativos</dt><dd>S/ 193.17</dd></div>
+          <div class="op"><dt><span class="op-sign ambar">−</span> Inversión IME</dt><dd>S/ 290.00</dd></div>
+          <div class="total"><dt>Saldo final</dt><dd>S/ 1,077.88</dd></div>
+        </dl>
+      </div>
+    </section>
+    
+    
+    <div class="stat-strip">
+      <div class="stat">
+        <span class="stat-label">Saldo inicial</span>
+        <span class="stat-value">S/ 921.05</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Ingresos</span>
+        <span class="stat-value verde">S/ 640.00</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Egresos operativos</span>
+        <span class="stat-value rojo">S/ 193.17</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Inversión IME</span>
+        <span class="stat-value ambar">S/ 290.00</span>
+      </div>
     </div>
     
 
-    <h2>¿De dónde vino el dinero?</h2>
-    <div class="cards">
-        <article class="card ingreso">
-          <div class="top">
-            <h3><span class="icono">👥</span> Membresías (fees mensuales)</h3>
-            <div class="monto">+ S/ 640.00</div>
-          </div>
-          <dl>
-            <div><dt>Detalle</dt><dd>64 aportes de S/10 entre el 23 y 30 de marzo (semana 1 del ciclo).</dd></div>
-            <div><dt>Origen</dt><dd>Aporte de los miembros activos de 180DC PUCP.</dd></div>
-          </dl>
-        </article>
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Movimientos</p>
+          <h3 class="section-title-big">Ingresos del mes</h3>
         </div>
+        <div class="section-total verde">
+          <span class="total-label">Total</span>
+          <span class="total-value">+ S/ 640.00</span>
+        </div>
+      </div>
+      <div class="tx-list">
+    <article class="tx-row tx-in">
+      <div class="tx-main">
+        <div class="tx-head">
+          <h4 class="tx-title">Membresías (fees mensuales)</h4>
+          <div class="tx-monto in">+ S/ 640.00</div>
+        </div>
+        <div class="row-meta"><span class="row-badge in">Ingreso</span></div>
+        <p class="tx-desc">64 aportes de S/10 entre el 23 y 30 de marzo (semana 1 del ciclo).</p>
+      </div>
+    </article>
+    </div>
+    </section>
 
-    <h2>¿En qué se usó el dinero?</h2>
-    
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Movimientos</p>
+          <h3 class="section-title-big">Egresos del mes</h3>
+        </div>
+        <div class="section-total rojo">
+          <span class="total-label">Total</span>
+          <span class="total-value">− S/ 483.17</span>
+        </div>
+      </div>
+      
         <div class="info-box">
-          <strong>¿Qué es "Inversión"?</strong>
-          A diferencia de un gasto operativo (bocaditos, transporte, impuestos
-          que se consumen el mismo mes), una <strong>inversión</strong> compra
-          bienes que se quedan con la agrupación y se siguen usando en ciclos
-          futuros (por ejemplo: polos institucionales y photochecks que se
-          entregan a miembros año a año). Por eso se muestra por separado.
+          <strong>Inversión IME</strong>
+          Compras de bienes durables que permanecen como activo de la
+          agrupación (polos institucionales, photochecks, equipamiento)
+          y se reutilizan en ciclos siguientes. Se reporta separada del
+          gasto operativo para no distorsionar el resultado del mes.
         </div>
         
-    <div class="cards">
-        <article class="card ">
-          <div class="top">
-            <div>
-              <h3><span class="icono">🖍️</span> Materiales y papelotes
-                  <span class="badge op">Gasto operativo</span></h3>
-              <div class="meta">
-                <span>24/03/2026</span>
-                <span>Bienvenida — Insumos</span>
-              </div>
-            </div>
-            <div class="monto">− S/ 131.17</div>
-          </div>
-          <dl>
-            <div><dt>¿En qué se usó?</dt><dd>Papelotes, plumones e insumos para dinámicas de la bienvenida.</dd></div>
-          </dl>
-        </article>
-        
-        <article class="card inversion">
-          <div class="top">
-            <div>
-              <h3><span class="icono">👕</span> Polos institucionales (lote 1)
-                  <span class="badge inv">Inversión</span></h3>
-              <div class="meta">
-                <span>13/03/2026</span>
-                <span>Inversión — Polos</span>
-              </div>
-            </div>
-            <div class="monto">− S/ 120.00</div>
-          </div>
-          <dl>
-            <div><dt>¿En qué se usó?</dt><dd>Compra de polos con identidad 180DC para miembros del ciclo.</dd></div>
-          </dl>
-        </article>
-        
-        <article class="card inversion">
-          <div class="top">
-            <div>
-              <h3><span class="icono">👕</span> Polos institucionales (lote 2)
-                  <span class="badge inv">Inversión</span></h3>
-              <div class="meta">
-                <span>18/03/2026</span>
-                <span>Inversión — Polos</span>
-              </div>
-            </div>
-            <div class="monto">− S/ 120.00</div>
-          </div>
-          <dl>
-            <div><dt>¿En qué se usó?</dt><dd>Segundo lote de polos para cubrir la demanda de miembros nuevos.</dd></div>
-          </dl>
-        </article>
-        
-        <article class="card ">
-          <div class="top">
-            <div>
-              <h3><span class="icono">🥨</span> Bocaditos para la bienvenida
-                  <span class="badge op">Gasto operativo</span></h3>
-              <div class="meta">
-                <span>24/03/2026</span>
-                <span>Bienvenida — Insumos</span>
-              </div>
-            </div>
-            <div class="monto">− S/ 62.00</div>
-          </div>
-          <dl>
-            <div><dt>¿En qué se usó?</dt><dd>Snacks y bebidas para la actividad de bienvenida del ciclo (S0).</dd></div>
-          </dl>
-        </article>
-        
-        <article class="card inversion">
-          <div class="top">
-            <div>
-              <h3><span class="icono">🪪</span> Photochecks
-                  <span class="badge inv">Inversión</span></h3>
-              <div class="meta">
-                <span>13/03/2026</span>
-                <span>Inversión — Photochecks</span>
-              </div>
-            </div>
-            <div class="monto">− S/ 50.00</div>
-          </div>
-          <dl>
-            <div><dt>¿En qué se usó?</dt><dd>Photochecks (credenciales con cordón) para identificar a los miembros.</dd></div>
-          </dl>
-        </article>
+      <div class="tx-list">
+    <article class="tx-row tx-op">
+      <div class="tx-main">
+        <div class="tx-head">
+          <h4 class="tx-title">Materiales</h4>
+          <div class="tx-monto op">− S/ 131.17</div>
         </div>
-
-    <h2>Cómo se distribuyó</h2>
-    <div class="chart-grid">
-      <div class="chart-block">
-        <h3>Distribución de egresos por categoría</h3>
-        <div class="donut-block"><svg viewBox="0 0 260 260" width="100%" height="260" preserveAspectRatio="xMidYMid meet"><path d="M 130.00 20.80 A 109.20 109.20 0 0 1 132.25 239.18 L 131.40 197.69 A 67.70 67.70 0 0 0 130.00 62.30 Z" fill="#003C71" stroke="white" stroke-width="2"/><path d="M 132.25 239.18 A 109.20 109.20 0 0 1 63.90 43.08 L 89.02 76.11 A 67.70 67.70 0 0 0 131.40 197.69 Z" fill="#0072CE" stroke="white" stroke-width="2"/><path d="M 63.90 43.08 A 109.20 109.20 0 0 1 130.00 20.80 L 130.00 62.30 A 67.70 67.70 0 0 0 89.02 76.11 Z" fill="#F6AE2D" stroke="white" stroke-width="2"/><text x="130.0" y="126.0" text-anchor="middle" font-size="11" fill="#6C757D">Total</text><text x="130.0" y="144.0" text-anchor="middle" font-size="16" font-weight="700" fill="#003C71">S/ 483.17</text></svg><ul class="donut-legend"><li><span class="dot" style="background:#003C71"></span><span class="lbl">Inversión — Polos</span><span class="val">S/ 240.00 <em>· 50%</em></span></li><li><span class="dot" style="background:#0072CE"></span><span class="lbl">Bienvenida — Insumos</span><span class="val">S/ 193.17 <em>· 40%</em></span></li><li><span class="dot" style="background:#F6AE2D"></span><span class="lbl">Inversión — Photochecks</span><span class="val">S/ 50.00 <em>· 10%</em></span></li></ul></div>
+        <div class="row-meta"><span class="row-badge op">Operativo</span><span class="row-sep"></span><span class="row-meta-item">24 Mar</span><span class="row-sep"></span><span class="row-meta-item">Bienvenida — Insumos</span></div>
+        <p class="tx-desc">Papelotes, plumones e insumos para dinámicas de la bienvenida.</p>
       </div>
-      <div class="chart-block">
-        <h3>Comparativo del mes</h3>
-        <svg viewBox="0 0 420 260" width="100%" preserveAspectRatio="xMidYMid meet"><line x1="40" y1="224.0" x2="404" y2="224.0" stroke="#E5E7EB" stroke-dasharray="2,3"/><text x="34" y="227.0" text-anchor="end" font-size="10" fill="#6C757D">S/ 0</text><line x1="40" y1="172.0" x2="404" y2="172.0" stroke="#E5E7EB" stroke-dasharray="2,3"/><text x="34" y="175.0" text-anchor="end" font-size="10" fill="#6C757D">S/ 200</text><line x1="40" y1="120.0" x2="404" y2="120.0" stroke="#E5E7EB" stroke-dasharray="2,3"/><text x="34" y="123.0" text-anchor="end" font-size="10" fill="#6C757D">S/ 400</text><line x1="40" y1="68.0" x2="404" y2="68.0" stroke="#E5E7EB" stroke-dasharray="2,3"/><text x="34" y="71.0" text-anchor="end" font-size="10" fill="#6C757D">S/ 600</text><line x1="40" y1="16.0" x2="404" y2="16.0" stroke="#E5E7EB" stroke-dasharray="2,3"/><text x="34" y="19.0" text-anchor="end" font-size="10" fill="#6C757D">S/ 800</text><rect x="67.3" y="57.6" width="66.7" height="166.4" rx="4" fill="#2BA84A"/><text x="100.7" y="51.6" text-anchor="middle" font-size="11" font-weight="600" fill="#1F2937">S/ 640.00</text><rect x="188.6" y="173.8" width="66.7" height="50.2" rx="4" fill="#D7263D"/><text x="222.0" y="167.8" text-anchor="middle" font-size="11" font-weight="600" fill="#1F2937">S/ 193.17</text><rect x="310.0" y="148.6" width="66.7" height="75.4" rx="4" fill="#F6AE2D"/><text x="343.3" y="142.6" text-anchor="middle" font-size="11" font-weight="600" fill="#1F2937">S/ 290.00</text><text x="100.7" y="242.0" text-anchor="middle" font-size="11" fill="#4B5563">Ingresos</text><text x="222.0" y="242.0" text-anchor="middle" font-size="11" fill="#4B5563">Egresos op.</text><text x="343.3" y="242.0" text-anchor="middle" font-size="11" fill="#4B5563">Inversión</text></svg>
-      </div>
-    </div>
-
-    <div class="cierre"><strong>En resumen.</strong> Marzo concentra los <strong>gastos de arranque</strong> del ciclo: bienvenida e inventario institucional (polos y photochecks). El saldo creció porque los fees del ciclo se cobraron casi en su totalidad durante la primera semana de clases.</div>
-
-    <h2>Verificación y datos abiertos</h2>
+    </article>
     
+    <article class="tx-row tx-inv">
+      <div class="tx-main">
+        <div class="tx-head">
+          <h4 class="tx-title">Polos institucionales</h4>
+          <div class="tx-monto inv">− S/ 120.00</div>
+        </div>
+        <div class="row-meta"><span class="row-badge inv">Inversión IME</span><span class="row-sep"></span><span class="row-meta-item">13–18 Mar</span><span class="row-sep"></span><span class="row-meta-item">Inversión — Polos</span></div>
+        <p class="tx-desc">Compra de polos con identidad 180DC para miembros del ciclo.</p>
+      </div>
+    </article>
+    
+    <article class="tx-row tx-op">
+      <div class="tx-main">
+        <div class="tx-head">
+          <h4 class="tx-title">Catering para la bienvenida</h4>
+          <div class="tx-monto op">− S/ 62.00</div>
+        </div>
+        <div class="row-meta"><span class="row-badge op">Operativo</span><span class="row-sep"></span><span class="row-meta-item">24 Mar</span><span class="row-sep"></span><span class="row-meta-item">Bienvenida — Insumos</span></div>
+        <p class="tx-desc">Snacks y bebidas para la actividad de bienvenida del ciclo (S0).</p>
+      </div>
+    </article>
+    
+    <article class="tx-row tx-inv">
+      <div class="tx-main">
+        <div class="tx-head">
+          <h4 class="tx-title">Photochecks</h4>
+          <div class="tx-monto inv">− S/ 50.00</div>
+        </div>
+        <div class="row-meta"><span class="row-badge inv">Inversión IME</span><span class="row-sep"></span><span class="row-meta-item">13 Mar</span><span class="row-sep"></span><span class="row-meta-item">Inversión — Photochecks</span></div>
+        <p class="tx-desc">Photochecks (credenciales con cordón) para identificar a los miembros.</p>
+      </div>
+    </article>
+    </div>
+    </section>
+
+    <section class="section">
+      <p class="section-eyebrow">Visualización</p>
+      <h3 class="section-title-big">Distribución del gasto</h3>
+      <div class="chart-grid">
+        <div class="chart-block">
+          <h4 class="chart-title">Egresos por categoría</h4>
+          <div class="donut-block"><svg viewBox="0 0 240 240" width="240" height="240" preserveAspectRatio="xMidYMid meet"><path d="M 120.00 19.20 A 100.80 100.80 0 1 1 99.93 218.78 L 106.75 185.20 A 66.53 66.53 0 1 0 120.00 53.47 Z" fill="#7AB929"/><path d="M 99.93 218.78 A 100.80 100.80 0 0 1 43.28 54.62 L 69.36 76.85 A 66.53 66.53 0 0 0 106.75 185.20 Z" fill="#1F2937"/><path d="M 43.28 54.62 A 100.80 100.80 0 0 1 120.00 19.20 L 120.00 53.47 A 66.53 66.53 0 0 0 69.36 76.85 Z" fill="#F59E0B"/><text x="120.0" y="114.0" text-anchor="middle" font-size="10" letter-spacing="1" fill="#9CA3AF">TOTAL</text><text x="120.0" y="134.0" text-anchor="middle" font-size="18" font-weight="700" fill="#0A0A0A">S/ 363.17</text></svg><ul class="donut-legend"><li><span class="dot" style="background:#7AB929"></span><span class="lbl">Bienvenida — Insumos</span><span class="pct">53%</span><span class="val">S/ 193.17</span></li><li><span class="dot" style="background:#1F2937"></span><span class="lbl">Inversión — Polos</span><span class="pct">33%</span><span class="val">S/ 120.00</span></li><li><span class="dot" style="background:#F59E0B"></span><span class="lbl">Inversión — Photochecks</span><span class="pct">14%</span><span class="val">S/ 50.00</span></li></ul></div>
+        </div>
+        <div class="chart-block">
+          <h4 class="chart-title">Comparativo del mes</h4>
+          <svg viewBox="0 0 420 240" width="100%" preserveAspectRatio="xMidYMid meet"><text x="16" y="16" font-size="10" fill="#9CA3AF" letter-spacing="1">S/</text><line x1="48" y1="196.0" x2="408" y2="196.0" stroke="#F3F4F6"/><text x="40" y="199.0" text-anchor="end" font-size="10" fill="#9CA3AF">0</text><line x1="48" y1="153.0" x2="408" y2="153.0" stroke="#F3F4F6"/><text x="40" y="156.0" text-anchor="end" font-size="10" fill="#9CA3AF">200</text><line x1="48" y1="110.0" x2="408" y2="110.0" stroke="#F3F4F6"/><text x="40" y="113.0" text-anchor="end" font-size="10" fill="#9CA3AF">400</text><line x1="48" y1="67.0" x2="408" y2="67.0" stroke="#F3F4F6"/><text x="40" y="70.0" text-anchor="end" font-size="10" fill="#9CA3AF">600</text><line x1="48" y1="24.0" x2="408" y2="24.0" stroke="#F3F4F6"/><text x="40" y="27.0" text-anchor="end" font-size="10" fill="#9CA3AF">800</text><line x1="48" y1="196.0" x2="408" y2="196.0" stroke="#D1D5DB"/><rect x="81.0" y="58.4" width="54.0" height="137.6" rx="3" fill="#7AB929"/><text x="108.0" y="50.4" text-anchor="middle" font-size="11" font-weight="700" fill="#0A0A0A">S/ 640.00</text><rect x="201.0" y="154.5" width="54.0" height="41.5" rx="3" fill="#DC2626"/><text x="228.0" y="146.5" text-anchor="middle" font-size="11" font-weight="700" fill="#0A0A0A">S/ 193.17</text><rect x="321.0" y="133.7" width="54.0" height="62.4" rx="3" fill="#F59E0B"/><text x="348.0" y="125.7" text-anchor="middle" font-size="11" font-weight="700" fill="#0A0A0A">S/ 290.00</text><text x="108.0" y="220.0" text-anchor="middle" font-size="11" fill="#6B7280" font-weight="500" letter-spacing="0.3">Ingresos</text><text x="228.0" y="220.0" text-anchor="middle" font-size="11" fill="#6B7280" font-weight="500" letter-spacing="0.3">Egresos op.</text><text x="348.0" y="220.0" text-anchor="middle" font-size="11" fill="#6B7280" font-weight="500" letter-spacing="0.3">Inversión</text></svg>
+        </div>
+      </div>
+    </section>
+
+    
+        <section class="analisis-section">
+          <p class="section-eyebrow">Análisis</p>
+          <h3 class="section-title-big">Comentario del mes</h3>
+          <blockquote class="pullquote">Marzo concentra los <strong>gastos de arranque</strong> del ciclo: bienvenida e inventario institucional (polos y photochecks). El saldo creció porque los fees del ciclo se cobraron casi en su totalidad durante la primera semana de clases.</blockquote>
+        </section>
+        
+
+    <section class="section">
+      <p class="section-eyebrow">Verificación</p>
+      <h3 class="section-title-big">Datos abiertos</h3>
+      
     <div class="descarga">
       <div class="descarga-info">
-        <strong>Archivo fuente del mes</strong>
-        <p>Toda la información de este informe proviene del Registro de
-           Transacciones contable. Puedes descargarlo para verificar línea
-           por línea.</p>
+        <p class="eyebrow">Archivo fuente</p>
+        <h4>Registro de Transacciones — Marzo 2026-1</h4>
+        <p>Verifica línea por línea. Los datos del informe se generan
+           automáticamente a partir de este archivo.</p>
       </div>
       <a class="btn-descarga" href="../downloads/transacciones_marzo.xlsx" download>
-        ⬇ Descargar Excel (transacciones_marzo.xlsx)
+        <span>Descargar Excel</span>
+        <span class="btn-arrow">↓</span>
       </a>
     </div>
     
+    </section>
     
   </main>
   <footer>
-    Portal de transparencia 180DC PUCP · Fuente: Registro de Transacciones mensual ·
-    Generado automáticamente a partir de los archivos contables del ciclo.
+    <div class="wrap footer-inner">
+      <div>
+        <p class="footer-title">180 Degrees Consulting PUCP</p>
+        <p class="footer-sub">Portal de Transparencia Financiera · Ciclo 2026-1</p>
+      </div>
+      <div class="footer-meta">
+        <p>Información derivada del Registro de Transacciones mensual.</p>
+        <p>Consultas: área financiera.</p>
+      </div>
+    </div>
   </footer>
 </body>
 </html>

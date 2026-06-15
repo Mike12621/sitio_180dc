@@ -3,84 +3,267 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>180DC PUCP · Portal de Transparencia Financiera</title>
+<title>180DC PUCP · Transparencia Financiera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
   <header class="site-header">
-    <div class="wrap">
-      <h1>180DC PUCP · Portal de Transparencia Financiera</h1>
-      <p>Ciclo académico 2026-1 · Rendición de cuentas mensual</p>
-      <nav><a class="active" href="index.html">Inicio</a><a href="meses/marzo.html">Marzo 2026-1</a><a href="meses/abril.html">Abril 2026-1</a></nav>
+    <div class="header-inner wrap">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 32 32" width="28" height="28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="none" stroke="#7AB929" stroke-width="1.5"/><path d="M 4 11 Q 16 7 28 11" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/><path d="M 3 16 Q 16 12 29 16" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/><path d="M 4 21 Q 16 25 28 21" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <div class="brand-text">
+          <span class="brand-name">180DC PUCP</span>
+          <span class="brand-sub">Transparencia financiera</span>
+        </div>
+      </a>
+      <nav class="main-nav"><a class="active" href="index.html">Inicio</a><a href="meses/marzo.html">Marzo</a><a href="meses/abril.html">Abril</a><a href="meses/mayo.html">Mayo</a><a href="meses/junio.html">Junio</a></nav>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span>Ciclo 2026-1</span>
+      </div>
     </div>
   </header>
   <main class="wrap">
     
-    <p class="lead">
-      Este portal muestra de manera <strong>abierta y verificable</strong> cómo
-      ingresa y sale el dinero de la agrupación durante el ciclo 2026-1.
-      Cada egreso indica <strong>en qué se usó</strong> y <strong>a quién benefició</strong>.
-    </p>
-
-    <h2>Visión del ciclo</h2>
     
-    <div class="kpis">
-      <div class="kpi"><div class="label">Saldo de inicio del ciclo</div><div class="value">S/ 921.05</div></div>
-      <div class="kpi verde"><div class="label">Ingresos acumulados</div><div class="value">S/ 750.00</div></div>
-      <div class="kpi rojo"><div class="label">Egresos operativos</div><div class="value">S/ 268.05</div></div>
-      <div class="kpi ambar"><div class="label">Inversión acumulada</div><div class="value">S/ 290.00</div></div>
-      <div class="kpi azul"><div class="label">Saldo actual</div><div class="value">S/ 1,113.00</div></div>
+    <section class="index-hero">
+      <p class="eyebrow">180 Degrees Consulting PUCP</p>
+      <h1 class="hero-title">Reporte de transparencia financiera</h1>
+      <p class="hero-lead">
+        Movimiento financiero detallado de la agrupación durante el ciclo
+        académico 2026-1. Cada transacción cuenta con su descripción y el
+        archivo fuente está disponible para verificación.
+      </p>
+      <div class="hero-saldo-strip">
+        <div>
+          <p class="eyebrow">Saldo actual</p>
+          <div class="hero-saldo-big">S/ 71.60</div>
+          <p class="hero-saldo-delta down">
+            <span class="arrow">↓</span>
+            − S/ 849.45 desde el inicio del ciclo
+          </p>
+        </div>
+      </div>
+    </section>
+    
+    
+    <div class="stat-strip stat-strip-index">
+      <div class="stat">
+        <span class="stat-label">Saldo de inicio</span>
+        <span class="stat-value">S/ 921.05</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Ingresos acumulados</span>
+        <span class="stat-value verde">S/ 750.00</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Egresos operativos</span>
+        <span class="stat-value rojo">S/ 1,309.45</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Inversión IME</span>
+        <span class="stat-value ambar">S/ 290.00</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Meses reportados</span>
+        <span class="stat-value">4</span>
+      </div>
     </div>
     
 
-    <div class="info-box">
-      <strong>Sobre la "Inversión":</strong> separamos del gasto regular las
-      compras de bienes que <em>no se consumen</em> en el mes y se quedan con
-      la agrupación para ciclos futuros (polos institucionales, photochecks,
-      eventualmente equipamiento). Esto evita inflar los egresos del mes en que
-      se compraron.
-    </div>
-
-    <h2>Informes mensuales</h2>
-    <div class="meses-grid">
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Reportes</p>
+          <h3 class="section-title-big">Informes mensuales</h3>
+        </div>
+      </div>
+      <div class="meses-grid">
         <a class="mes-card" href="meses/marzo.html">
-          <div class="mes">Marzo 2026-1</div>
-          <h3>Estado de cuenta del mes</h3>
-          <p class="resumen">Marzo concentra los gastos de arranque del ciclo: bienvenida e inventario institucional (polos y photochecks). El saldo creció porque los fe…</p>
-          <div class="stats">
-            <div><span>Ingresos</span><b>S/ 640.00</b></div>
-            <div><span>Egresos</span><b>S/ 483.17</b></div>
-            <div><span>Saldo final</span><b>S/ 1,077.88</b></div>
+          <div class="mes-card-head">
+            <div>
+              <p class="eyebrow">Mes 01 · 2026-1</p>
+              <h3 class="mes-card-title">Marzo</h3>
+            </div>
+            <span class="mes-arrow">→</span>
+          </div>
+          <div class="mes-card-saldo">
+            <p class="eyebrow">Saldo final</p>
+            <div class="mes-saldo-num">S/ 1,077.88</div>
+            <p class="mes-delta up">
+              <span class="arrow">↑</span>
+              + S/ 156.83
+            </p>
+          </div>
+          <div class="mes-card-stats">
+            <div>
+              <span>Ingresos</span>
+              <b class="verde">+ S/ 640.00</b>
+            </div>
+            <div>
+              <span>Egresos op.</span>
+              <b class="rojo">− S/ 193.17</b>
+            </div>
+            <div>
+              <span>Inversión</span>
+              <b class="ambar">− S/ 290.00</b>
+            </div>
           </div>
         </a>
         
         <a class="mes-card" href="meses/abril.html">
-          <div class="mes">Abril 2026-1</div>
-          <h3>Estado de cuenta del mes</h3>
-          <p class="resumen">Abril fue un mes de baja actividad: caen los fees porque la mayoría se cobró en marzo, y los egresos se limitaron a una capacitación externa…</p>
-          <div class="stats">
-            <div><span>Ingresos</span><b>S/ 110.00</b></div>
-            <div><span>Egresos</span><b>S/ 74.88</b></div>
-            <div><span>Saldo final</span><b>S/ 1,113.00</b></div>
+          <div class="mes-card-head">
+            <div>
+              <p class="eyebrow">Mes 02 · 2026-1</p>
+              <h3 class="mes-card-title">Abril</h3>
+            </div>
+            <span class="mes-arrow">→</span>
+          </div>
+          <div class="mes-card-saldo">
+            <p class="eyebrow">Saldo final</p>
+            <div class="mes-saldo-num">S/ 1,113.00</div>
+            <p class="mes-delta up">
+              <span class="arrow">↑</span>
+              + S/ 35.12
+            </p>
+          </div>
+          <div class="mes-card-stats">
+            <div>
+              <span>Ingresos</span>
+              <b class="verde">+ S/ 110.00</b>
+            </div>
+            <div>
+              <span>Egresos op.</span>
+              <b class="rojo">− S/ 74.88</b>
+            </div>
+            <div>
+              <span>Inversión</span>
+              <b class="ambar">− S/ 0.00</b>
+            </div>
+          </div>
+        </a>
+        
+        <a class="mes-card" href="meses/mayo.html">
+          <div class="mes-card-head">
+            <div>
+              <p class="eyebrow">Mes 03 · 2026-1</p>
+              <h3 class="mes-card-title">Mayo</h3>
+            </div>
+            <span class="mes-arrow">→</span>
+          </div>
+          <div class="mes-card-saldo">
+            <p class="eyebrow">Saldo final</p>
+            <div class="mes-saldo-num">S/ 1,049.50</div>
+            <p class="mes-delta down">
+              <span class="arrow">↓</span>
+              − S/ 63.50
+            </p>
+          </div>
+          <div class="mes-card-stats">
+            <div>
+              <span>Ingresos</span>
+              <b class="verde">+ S/ 0.00</b>
+            </div>
+            <div>
+              <span>Egresos op.</span>
+              <b class="rojo">− S/ 63.50</b>
+            </div>
+            <div>
+              <span>Inversión</span>
+              <b class="ambar">− S/ 0.00</b>
+            </div>
+          </div>
+        </a>
+        
+        <a class="mes-card" href="meses/junio.html">
+          <div class="mes-card-head">
+            <div>
+              <p class="eyebrow">Mes 04 · 2026-1</p>
+              <h3 class="mes-card-title">Junio</h3>
+            </div>
+            <span class="mes-arrow">→</span>
+          </div>
+          <div class="mes-card-saldo">
+            <p class="eyebrow">Saldo final</p>
+            <div class="mes-saldo-num">S/ 71.60</div>
+            <p class="mes-delta down">
+              <span class="arrow">↓</span>
+              − S/ 977.90
+            </p>
+          </div>
+          <div class="mes-card-stats">
+            <div>
+              <span>Ingresos</span>
+              <b class="verde">+ S/ 0.00</b>
+            </div>
+            <div>
+              <span>Egresos op.</span>
+              <b class="rojo">− S/ 977.90</b>
+            </div>
+            <div>
+              <span>Inversión</span>
+              <b class="ambar">− S/ 0.00</b>
+            </div>
           </div>
         </a>
         </div>
+    </section>
 
-    <h2>Sobre la información publicada</h2>
-    <p>
-      Los montos se toman directamente del <em>Registro de Transacciones</em>
-      mensual que mantiene el área financiera. Cada movimiento del archivo
-      contable original tiene su correlativo en el portal, y el
-      <strong>archivo fuente de cada mes está disponible para descarga</strong>
-      desde su página correspondiente, para que cualquiera pueda verificar la
-      información línea por línea. Para preguntas o detalle adicional puedes
-      contactar al área financiera.
-    </p>
+    <section class="section two-col">
+      <div>
+        <p class="section-eyebrow">Marco contable</p>
+        <h3 class="section-title-big">Metodología</h3>
+        <p class="prose">
+          Los montos provienen directamente del <em>Registro de Transacciones</em>
+          mensual que mantiene el área financiera. Cada movimiento del archivo
+          contable original tiene su correlativo en el portal, y el archivo
+          fuente de cada mes está disponible para descarga, lo cual permite
+          verificación línea por línea.
+        </p>
+        <p class="prose">
+          Para consultas adicionales o detalle complementario, comunícate con
+          el área financiera de la agrupación.
+        </p>
+      </div>
+      <div>
+        <p class="section-eyebrow">Definiciones</p>
+        <h3 class="section-title-big">Conceptos clave</h3>
+        <dl class="def-list">
+          <div>
+            <dt>Ingresos</dt>
+            <dd>Fondos que entran a caja en el mes (membresías, donaciones, recaudaciones, patrocinios).</dd>
+          </div>
+          <div>
+            <dt>Egresos operativos</dt>
+            <dd>Consumibles del mes: bocaditos, transporte, ITF, capacitaciones, integración.</dd>
+          </div>
+          <div>
+            <dt>Inversión IME</dt>
+            <dd>Inventario / material reutilizable. Bienes durables que permanecen como activo de la agrupación.</dd>
+          </div>
+          <div>
+            <dt>Saldo final</dt>
+            <dd>Saldo inicial + Ingresos − Egresos operativos − Inversión.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
     
   </main>
   <footer>
-    Portal de transparencia 180DC PUCP · Fuente: Registro de Transacciones mensual ·
-    Generado automáticamente a partir de los archivos contables del ciclo.
+    <div class="wrap footer-inner">
+      <div>
+        <p class="footer-title">180 Degrees Consulting PUCP</p>
+        <p class="footer-sub">Portal de Transparencia Financiera · Ciclo 2026-1</p>
+      </div>
+      <div class="footer-meta">
+        <p>Información derivada del Registro de Transacciones mensual.</p>
+        <p>Consultas: área financiera.</p>
+      </div>
+    </div>
   </footer>
 </body>
 </html>
