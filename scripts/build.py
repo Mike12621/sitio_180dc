@@ -15,6 +15,13 @@ from config_mes import NARRATIVA  # noqa: E402
 OUT_DIR = ROOT / "site"
 DATA_DIR = ROOT / "data"
 
+# =============================================================================
+# CONFIGURACIÓN DEL CICLO  ← lo único que cambia entre ciclos
+# =============================================================================
+# Para empezar un ciclo nuevo (ej. 2026-2): cambia CICLO y reemplaza la lista
+# MESES_CONFIG por los meses del nuevo ciclo. Ver README.md.
+CICLO = "2026-1"
+
 MESES_CONFIG = [
     {"mes": "Marzo", "slug": "marzo", "xlsx": "transacciones_marzo.xlsx"},
     {"mes": "Abril", "slug": "abril", "xlsx": "transacciones_abril.xlsx"},
@@ -212,7 +219,7 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
       {nav}
       <div class="header-status">
         <span class="status-dot"></span>
-        <span>Ciclo 2026-1</span>
+        <span>Ciclo {CICLO}</span>
       </div>
     </div>
   </header>
@@ -223,7 +230,7 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
     <div class="wrap footer-inner">
       <div>
         <p class="footer-title">180 Degrees Consulting PUCP</p>
-        <p class="footer-sub">Portal de Transparencia Financiera · Ciclo 2026-1</p>
+        <p class="footer-sub">Portal de Transparencia Financiera · Ciclo {CICLO}</p>
       </div>
       <div class="footer-meta">
         <p>Información derivada del Registro de Transacciones mensual.</p>
@@ -430,11 +437,11 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
     <div class="breadcrumb">
       <a href="../index.html">Inicio</a>
       <span class="bc-sep">/</span>
-      <span>{info.mes} 2026-1</span>
+      <span>{info.mes} {info.ciclo}</span>
     </div>
 
     <header class="page-hero">
-      <p class="eyebrow">Ciclo 2026-1 · Reporte mensual</p>
+      <p class="eyebrow">Ciclo {info.ciclo} · Reporte mensual</p>
       <h1 class="page-title">{info.mes}</h1>
       <p class="page-meta">
         Responsable de actualización: <strong>{esc(info.responsable)}</strong>
@@ -498,7 +505,7 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
       {descarga_html}
     </section>
     """
-    return layout(f"{info.mes} 2026-1 · 180DC PUCP", body,
+    return layout(f"{info.mes} {info.ciclo} · 180DC PUCP", body,
                   slug_actual=slug, asset_prefix="..")
 
 
@@ -522,7 +529,7 @@ def render_index(infos: list[InformeMes]) -> str:
       <h1 class="hero-title">Reporte de transparencia financiera</h1>
       <p class="hero-lead">
         Movimiento financiero detallado de la agrupación durante el ciclo
-        académico 2026-1. Cada transacción cuenta con su descripción y el
+        académico {CICLO}. Cada transacción cuenta con su descripción y el
         archivo fuente está disponible para verificación.
       </p>
       <div class="hero-saldo-strip">
@@ -574,7 +581,7 @@ def render_index(infos: list[InformeMes]) -> str:
         <a class="mes-card" href="meses/{cfg['slug']}.html">
           <div class="mes-card-head">
             <div>
-              <p class="eyebrow">Mes {idx:02d} · 2026-1</p>
+              <p class="eyebrow">Mes {idx:02d} · {info.ciclo}</p>
               <h3 class="mes-card-title">{info.mes}</h3>
             </div>
             <span class="mes-arrow">→</span>
@@ -676,7 +683,7 @@ def main():
     for cfg in MESES_CONFIG:
         xlsx_path = DATA_DIR / cfg["xlsx"]
         shutil.copy2(xlsx_path, downloads_dir / cfg["xlsx"])
-        info = cargar_mes(str(xlsx_path), cfg["mes"])
+        info = cargar_mes(str(xlsx_path), cfg["mes"], ciclo=CICLO)
         infos.append(info)
         html = render_mes(info, cfg["slug"], NARRATIVA.get(cfg["mes"], {}), cfg["xlsx"])
         out = OUT_DIR / "meses" / f"{cfg['slug']}.html"

@@ -8,9 +8,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 import re
 
-# Rubros que NO son egreso operativo sino INVERSIÓN / INVENTARIO (activo).
-RUBROS_INVERSION = {"Inventarios de equipo"}
-
 # Reglas para sub-categorizar la descripción (mapeo -> categoría legible para gráficos).
 # Orden importa: la primera regla que matchea gana.
 REGLAS_CATEGORIA = [
@@ -209,92 +206,3 @@ def cargar_mes(xlsx_path: str, mes: str, ciclo: str = "2026-1") -> InformeMes:
 
 def fmt_soles(x: float) -> str:
     return f"S/ {x:,.2f}"
-
-
-# Glosario humano por categoría — explica el PROPÓSITO de cada gasto/ingreso.
-# Una sola fuente de verdad: editar aquí cambia el texto del informe.
-GLOSAS = {
-    "Polos / Photochecks": {
-        "titulo": "Inventario: polos institucionales y photochecks",
-        "proposito": (
-            "Bienes durables adquiridos en la semana de bienvenida. Quedan "
-            "como activo de la agrupación para uso de los miembros durante "
-            "el ciclo (y los siguientes). No se consumen este mes."
-        ),
-    },
-    "Bienvenida — Insumos": {
-        "titulo": "Bienvenida: bocaditos y materiales",
-        "proposito": (
-            "Insumos consumidos en el evento de bienvenida del ciclo 2026-1: "
-            "bocaditos para asistentes y materiales/papelotes para las "
-            "dinámicas. Gasto único, no recurrente."
-        ),
-    },
-    "Capacitación": {
-        "titulo": "Capacitación BCG en la UP",
-        "proposito": (
-            "Aporte para participación de miembros en evento de capacitación "
-            "organizado por BCG en la Universidad del Pacífico. Pago vía Yape."
-        ),
-    },
-    "Integración": {
-        "titulo": "1ra Integración del ciclo",
-        "proposito": (
-            "Reserva del local + pizzas para la primera actividad de "
-            "integración con los miembros nuevos. Construye comunidad y "
-            "compromiso con la agrupación."
-        ),
-    },
-    "ITF / Impuestos": {
-        "titulo": "Impuesto a Transacciones Financieras (ITF)",
-        "proposito": (
-            "Cobro automático del banco por el traslado de fondos de "
-            "Interbank a BCP (consolidación de la cuenta activa). Costo "
-            "operativo necesario, no discrecional."
-        ),
-    },
-    "Membresías": {
-        "titulo": "Cuotas de los miembros (S/10 por persona)",
-        "proposito": (
-            "Aporte mensual fijo de S/10 por miembro activo. Es la única "
-            "fuente de ingresos regulares de la agrupación en este mes."
-        ),
-    },
-    "Constitución": {
-        "titulo": "Constitución de persona jurídica",
-        "proposito": (
-            "Gastos legales y registrales para la constitución formal de "
-            "180DC PUCP como persona jurídica: reserva de nombre, costos "
-            "registrales y escritura pública notarial."
-        ),
-    },
-    "Rifas — Premios": {
-        "titulo": "Premios de la rifa pro fondos",
-        "proposito": (
-            "Entrega de premios de la rifa de recaudación realizada en "
-            "febrero. Los premios se entregan con posterioridad al sorteo."
-        ),
-    },
-    "RUC": {
-        "titulo": "Trámite RUC",
-        "proposito": "Costo de constitución / mantenimiento del RUC institucional.",
-    },
-    "180 Talks": {
-        "titulo": "Evento 180 Talks",
-        "proposito": "Producción del evento académico-profesional del ciclo.",
-    },
-    "Rifas":      {"titulo": "Rifa de recaudación",
-                   "proposito": "Actividad de recaudación con ganancia neta."},
-    "Cursos":     {"titulo": "Cursos pagados",
-                   "proposito": "Recaudación vía cursos cobrados a la comunidad."},
-    "Donaciones": {"titulo": "Donaciones",
-                   "proposito": "Aportes voluntarios externos."},
-    "Patrocinios":{"titulo": "Patrocinios corporativos",
-                   "proposito": "Ingresos por convenios con empresas."},
-    "Otros":      {"titulo": "Otros",
-                   "proposito": "Movimientos no categorizados — revisar detalle."},
-}
-
-
-def glosa(cat: str):
-    return GLOSAS.get(cat, {"titulo": cat, "proposito": ""})

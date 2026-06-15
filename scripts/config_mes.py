@@ -1,12 +1,28 @@
 """
-config_mes.py — Diccionario por mes con la descripción de cada egreso e ingreso.
+config_mes.py — Textos del informe de cada mes (los NÚMEROS salen del Excel).
 
-Por cada egreso:
+Este archivo SOLO describe en palabras cada ingreso y egreso. Los montos,
+saldos y totales se calculan automáticamente desde el archivo Excel del mes
+(carpeta data/). Lo que escribas aquí debe coincidir, fila por fila, con ese
+Excel.
+
+Por cada INGRESO (lista "fuentes_ingresos"):
+  - nombre:   título corto (ej. "Membresías")
+  - monto:    monto en soles, sin "S/" (ej. 110.0)
+  - detalle:  explicación de una línea
+  - fecha:    opcional, "DD/MM/AAAA"
+
+Por cada EGRESO (lista "egresos"):
   - titulo:        nombre legible corto
-  - para_que:      descripción del gasto
-  - categoria_ui:  cómo se agrupa en la torta
-  - es_inversion:  True si es activo (no consumo del mes)
-  - icono:         emoji opcional
+  - monto:         monto en soles, sin "S/" (ej. 54.83)
+  - fecha:         "DD/MM/AAAA" (o rango "DD/MM/AAAA - DD/MM/AAAA")
+  - para_que:      ¿en qué se usó el dinero? (frase clara)
+  - categoria_ui:  etiqueta para agrupar en el gráfico de torta
+  - es_inversion:  True solo si es un bien reutilizable (polos, equipos);
+                   en la gran mayoría de casos es False
+
+Y "nota_cierre": un párrafo de resumen del mes. Usa **negritas** con dobles
+asteriscos si quieres resaltar algo.
 """
 
 # Marzo 2026-1 ----------------------------------------------------------------
