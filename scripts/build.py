@@ -158,16 +158,11 @@ def svg_barras(labels, values, colores, width=420, height=240):
     )
 
 
-def brand_mark():
-    """SVG inline del 'globo' rayado de 180DC en verde."""
+def brand_mark(asset_prefix="."):
+    """Logo 180DC desde imagen."""
     return (
-        '<svg class="brand-mark" viewBox="0 0 32 32" width="28" height="28" '
-        'xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
-        '<circle cx="16" cy="16" r="15" fill="none" stroke="#7AB929" stroke-width="1.5"/>'
-        '<path d="M 4 11 Q 16 7 28 11" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/>'
-        '<path d="M 3 16 Q 16 12 29 16" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/>'
-        '<path d="M 4 21 Q 16 25 28 21" fill="none" stroke="#7AB929" stroke-width="2.2" stroke-linecap="round"/>'
-        '</svg>'
+        f'<img class="brand-mark" src="{asset_prefix}/assets/180.jpg" '
+        f'width="28" height="28" alt="180DC PUCP">'
     )
 
 
@@ -208,7 +203,7 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
   <header class="site-header">
     <div class="header-inner wrap">
       <a class="brand" href="{home_href}">
-        {brand_mark()}
+        {brand_mark(asset_prefix)}
         <div class="brand-text">
           <span class="brand-name">180DC PUCP</span>
           <span class="brand-sub">Transparencia financiera</span>
