@@ -198,9 +198,10 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{esc(titulo)}</title>
+<link rel="icon" type="image/svg+xml" href="{asset_prefix}/assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{asset_prefix}/assets/style.css">
 </head>
 <body>
@@ -300,9 +301,9 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
         <p class="eyebrow">Cálculo</p>
         <dl class="calc-list">
           <div><dt>Saldo inicial</dt><dd>{fmt_soles(info.saldo_inicial)}</dd></div>
-          <div class="op"><dt><span class="op-sign verde">+</span> Ingresos</dt><dd>{fmt_soles(info.ingresos)}</dd></div>
+          {"" if info.ingresos == 0 else f'<div class="op"><dt><span class="op-sign verde">+</span> Ingresos</dt><dd>{fmt_soles(info.ingresos)}</dd></div>'}
           <div class="op"><dt><span class="op-sign rojo">−</span> Egresos operativos</dt><dd>{fmt_soles(info.egresos_op)}</dd></div>
-          <div class="op"><dt><span class="op-sign ambar">−</span> Inversión IME</dt><dd>{fmt_soles(info.inversion)}</dd></div>
+          {"" if info.inversion == 0 else f'<div class="op"><dt><span class="op-sign ambar">−</span> Inversión IME</dt><dd>{fmt_soles(info.inversion)}</dd></div>'}
           <div class="total"><dt>Saldo final</dt><dd>{fmt_soles(info.saldo_final)}</dd></div>
         </dl>
       </div>
@@ -310,24 +311,27 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
     """
 
     # ---- Stat strip
-    stat_strip = f"""
-    <div class="stat-strip">
-      <div class="stat">
+    stat_items = [f'''<div class="stat">
         <span class="stat-label">Saldo inicial</span>
         <span class="stat-value">{fmt_soles(info.saldo_inicial)}</span>
-      </div>
-      <div class="stat">
+      </div>''']
+    if info.ingresos > 0:
+        stat_items.append(f'''<div class="stat">
         <span class="stat-label">Ingresos</span>
         <span class="stat-value verde">{fmt_soles(info.ingresos)}</span>
-      </div>
-      <div class="stat">
+      </div>''')
+    stat_items.append(f'''<div class="stat">
         <span class="stat-label">Egresos operativos</span>
         <span class="stat-value rojo">{fmt_soles(info.egresos_op)}</span>
-      </div>
-      <div class="stat">
+      </div>''')
+    if info.inversion > 0:
+        stat_items.append(f'''<div class="stat">
         <span class="stat-label">Inversión IME</span>
         <span class="stat-value ambar">{fmt_soles(info.inversion)}</span>
-      </div>
+      </div>''')
+    stat_strip = f"""
+    <div class="stat-strip">
+      {''.join(stat_items)}
     </div>
     """
 
