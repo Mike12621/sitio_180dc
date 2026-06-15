@@ -10,32 +10,6 @@ Pensado para subir a **GitHub Pages** y mantener con esfuerzo mínimo.
 
 ---
 
-## Estructura del repo
-
-```
-sitio_180dc/
-├── data/                          # archivos fuente (no se publican)
-│   ├── transacciones_marzo.xlsx
-│   └── transacciones_abril.xlsx
-├── scripts/
-│   ├── helpers.py                 # carga / clasifica el xlsx
-│   ├── config_mes.py              # NARRATIVA por mes (qué, para qué, beneficio)
-│   └── build.py                   # genera el sitio
-├── site/                          # salida publicable (lo que sirve GitHub Pages)
-│   ├── index.html
-│   ├── assets/style.css
-│   ├── meses/marzo.html, abril.html
-│   └── downloads/                 # copia descargable de los xlsx fuente
-├── .github/workflows/deploy.yml   # auto-deploy en cada push
-├── requirements.txt
-└── README.md
-```
-
----
-
-
----
-
 ## Cómo agregar un mes nuevo (ej. Mayo)
 
 Tres pasos, **sin tocar el código de gráficos**.
