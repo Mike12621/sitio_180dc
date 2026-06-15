@@ -447,7 +447,7 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
     {hero_saldo}
     {stat_strip}
 
-    <section class="section">
+    {"" if info.ingresos == 0 else f'''<section class="section">
       <div class="section-head">
         <div>
           <p class="section-eyebrow">Movimientos</p>
@@ -458,8 +458,8 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
           <span class="total-value">+ {fmt_soles(info.ingresos)}</span>
         </div>
       </div>
-      <div class="tx-list">{''.join(filas_ingreso)}</div>
-    </section>
+      <div class="tx-list">{"".join(filas_ingreso)}</div>
+    </section>'''}
 
     <section class="section">
       <div class="section-head">
