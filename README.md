@@ -1,4 +1,4 @@
-# 180DC PUCP — Portal de Transparencia Financiera
+# 180DC PUCP — Portal de Transparencia Financiera 
 
 Sitio web que publica, mes a mes, en qué se gasta el dinero de la agrupación.
 Está hecho para mantenerse **sin saber programar**: editas un Excel, escribes
@@ -12,10 +12,10 @@ unas descripciones, ejecutas un comando y subes los cambios con GitHub Desktop.
 
 El sitio se arma a partir de **dos fuentes**:
 
-| Fuente | Qué aporta | Dónde está |
-|--------|-----------|------------|
+| Fuente               | Qué aporta                               | Dónde está                      |
+| -------------------- | ---------------------------------------- | ------------------------------- |
 | 📊 **Excel del mes** | Los **números**: saldos, montos, totales | `data/transacciones_<mes>.xlsx` |
-| ✍️ **Descripciones** | Los **textos**: en qué se usó cada gasto | `scripts/config_mes.py` |
+| ✍️ **Descripciones** | Los **textos**: en qué se usó cada gasto | `scripts/config_mes.py`         |
 
 Un comando (`python scripts/build.py`) junta ambos y genera las páginas web
 dentro de la carpeta `site/`. Al subir los cambios a GitHub, el sitio se
@@ -35,11 +35,13 @@ borra al pasar de ciclo.
 
 1. **Python** → https://www.python.org/downloads/
    Durante la instalación marca la casilla **"Add Python to PATH"**.
+
 2. **GitHub Desktop** → https://desktop.github.com/
    Inicia sesión y abre (clona) el repositorio `sitio_180dc`.
+
 3. Abre **PowerShell** (o la terminal) en la carpeta del proyecto y ejecuta
    una vez, para instalar las librerías necesarias:
-
+   
    ```powershell
    pip install -r requirements.txt
    ```
@@ -50,9 +52,11 @@ borra al pasar de ciclo.
 
 1. Abre el Excel del mes en `data/` (ej. `data/transacciones_mayo.xlsx`) y
    corrige lo que haga falta. Guarda.
-2. Si cambió alguna descripción, edítala en `scripts/config_mes.py`.
-3. Regenera el sitio:
 
+2. Si cambió alguna descripción, edítala en `scripts/config_mes.py`.
+
+3. Regenera el sitio:
+   
    ```powershell
    python scripts/build.py
    ```
@@ -73,6 +77,7 @@ borra al pasar de ciclo.
 Ejemplo: agregar **Julio**.
 
 ### Paso 1 — El Excel del mes
+
 Copia el registro de transacciones de julio a la carpeta `data/` con el nombre
 `transacciones_julio.xlsx`.
 
@@ -82,6 +87,7 @@ El Excel debe mantener el **mismo formato** que los meses anteriores (misma hoja
 anterior** y reemplazar los movimientos.
 
 Reglas del Excel:
+
 - La fila con **`Ord.` = 0** es el **saldo anterior** (el saldo final del mes
   pasado). De ahí arranca el mes.
 - Cada movimiento va con su `Ord.` (1, 2, 3…), su fecha en formato
@@ -90,6 +96,7 @@ Reglas del Excel:
   cuenta como **ingreso**; si no, como **egreso**.
 
 ### Paso 2 — Las descripciones
+
 Abre `scripts/config_mes.py` y agrega un bloque para julio copiando el patrón de
 un mes existente. Solo usa los campos que se listan al inicio de ese archivo:
 
@@ -146,6 +153,7 @@ Aparece como un indicador extra en la fila de cifras y como una sección
 la cuenta de la agrupación. Si el mes no tiene préstamos, omite la clave.
 
 ### Paso 3 — Registrar el mes en la lista
+
 Abre `scripts/build.py` y agrega el mes dentro de **su ciclo**, en la lista
 `CICLOS` (está cerca del inicio):
 
@@ -182,9 +190,11 @@ CICLOS = [
 > El mes aparece en el portal recién cuando pongas el archivo.
 
 ### Paso 4 — Generar y subir
+
 ```powershell
 python scripts/build.py
 ```
+
 Revisa el **cuadre** que imprime al final (ver sección 7), y sube con
 GitHub Desktop (Commit → Push).
 
@@ -197,6 +207,7 @@ en la sección "Histórico". Un ciclo nuevo se **agrega**, nunca se reemplaza �
 así no se borra la información ya publicada.
 
 1. En `scripts/build.py`, agrega un bloque al final de `CICLOS`:
+   
    ```python
    {
        "ciclo": "2026-2",
@@ -206,6 +217,7 @@ así no se borra la información ya publicada.
    },
    ```
 2. Apunta el ciclo vigente al nuevo:
+   
    ```python
    CICLO_ACTIVO = "2026-2"
    ```
@@ -274,6 +286,7 @@ Para ver el sitio en tu computadora antes de subirlo:
 ```powershell
 python -m http.server 8000 --directory site
 ```
+
 Luego abre http://localhost:8000 en el navegador.
 
 ---
