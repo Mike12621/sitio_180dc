@@ -16,18 +16,36 @@ OUT_DIR = ROOT / "site"
 DATA_DIR = ROOT / "data"
 
 # =============================================================================
-# CONFIGURACIÓN DEL CICLO  ← lo único que cambia entre ciclos
+# CONFIGURACIÓN DE CICLOS  ← lo único que cambia al pasar de ciclo
 # =============================================================================
-# Para empezar un ciclo nuevo (ej. 2026-2): cambia CICLO y reemplaza la lista
-# MESES_CONFIG por los meses del nuevo ciclo. Ver README.md.
-CICLO = "2026-1"
-
-MESES_CONFIG = [
-    {"mes": "Marzo", "slug": "marzo", "xlsx": "transacciones_marzo.xlsx"},
-    {"mes": "Abril", "slug": "abril", "xlsx": "transacciones_abril.xlsx"},
-    {"mes": "Mayo", "slug": "mayo", "xlsx": "transacciones_mayo.xlsx"},
-    {"mes": "Junio", "slug": "junio", "xlsx": "transacciones_junio.xlsx"},
+# Para empezar un ciclo nuevo: AGREGA un bloque nuevo al final de CICLOS (no
+# borres el anterior — el portal conserva el histórico) y apunta CICLO_ACTIVO
+# al ciclo nuevo. Ver README.md, sección 5.
+#
+# El "slug" es el nombre del archivo web y debe ser ÚNICO en todo el portal.
+# Si un mes se repite en un ciclo posterior (ej. otro Marzo), usa un slug con
+# el ciclo al final: "marzo-2027-1".
+CICLOS = [
+    {
+        "ciclo": "2026-1",
+        "meses": [
+            {"mes": "Marzo", "slug": "marzo", "xlsx": "transacciones_marzo.xlsx"},
+            {"mes": "Abril", "slug": "abril", "xlsx": "transacciones_abril.xlsx"},
+            {"mes": "Mayo", "slug": "mayo", "xlsx": "transacciones_mayo.xlsx"},
+            {"mes": "Junio", "slug": "junio", "xlsx": "transacciones_junio.xlsx"},
+            {"mes": "Julio", "slug": "julio", "xlsx": "transacciones_julio.xlsx"},
+        ],
+    },
+    {
+        "ciclo": "2026-2",
+        "meses": [
+            {"mes": "Agosto", "slug": "agosto", "xlsx": "transacciones_agosto.xlsx"},
+        ],
+    },
 ]
+
+# Ciclo que el portal muestra como vigente (cabecera, saldo actual del inicio).
+CICLO_ACTIVO = "2026-2"
 
 import re
 import math
@@ -147,8 +165,9 @@ def svg_barras(labels, values, colores, width=420, height=240):
             f'font-size="11" fill="#6B7280" font-weight="500" letter-spacing="0.3">{esc(lbl)}</text>'
         )
     yticks = []
-    for k in range(5):
-        val = nice * k / 4
+    # Marcas cada "step" (no en cuartos): así siempre quedan cifras redondas.
+    for k in range(int(round(nice / step)) + 1):
+        val = step * k
         y = pad_t + h - (val/nice)*h
         yticks.append(
             f'<line x1="{pad_l}" y1="{y:.1f}" x2="{pad_l+w}" y2="{y:.1f}" '
@@ -173,26 +192,26 @@ def brand_mark(asset_prefix="."):
     )
 
 
-def nav_html(slug_actual=None):
-    items = []
-    items.append(
-        f'<a href="../index.html"{" class=\"active\"" if slug_actual is None else ""}>Inicio</a>'
-    )
-    for m in MESES_CONFIG:
+def nav_html(meses, slug_actual=None):
+    """Navegación de una página de mes: los meses de SU ciclo."""
+    items = ['<a href="../index.html">Inicio</a>']
+    for m in meses:
         cls = ' class="active"' if m["slug"] == slug_actual else ""
         items.append(f'<a href="{m["slug"]}.html"{cls}>{m["mes"]}</a>')
     return f'<nav class="main-nav">{"".join(items)}</nav>'
 
 
-def nav_home():
+def nav_home(meses):
+    """Navegación del índice: los meses del ciclo vigente."""
     items = ['<a class="active" href="index.html">Inicio</a>']
-    for m in MESES_CONFIG:
+    for m in meses:
         items.append(f'<a href="meses/{m["slug"]}.html">{m["mes"]}</a>')
     return f'<nav class="main-nav">{"".join(items)}</nav>'
 
 
-def layout(titulo, body, slug_actual=None, asset_prefix="."):
-    nav = nav_home() if slug_actual is None else nav_html(slug_actual)
+def layout(titulo, body, ciclo, meses_nav, slug_actual=None, asset_prefix="."):
+    nav = (nav_home(meses_nav) if slug_actual is None
+           else nav_html(meses_nav, slug_actual))
     home_href = "index.html" if slug_actual is None else "../index.html"
     return f"""<!DOCTYPE html>
 <html lang="es">
@@ -219,7 +238,7 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
       {nav}
       <div class="header-status">
         <span class="status-dot"></span>
-        <span>Ciclo {CICLO}</span>
+        <span>Ciclo {ciclo}</span>
       </div>
     </div>
   </header>
@@ -230,7 +249,7 @@ def layout(titulo, body, slug_actual=None, asset_prefix="."):
     <div class="wrap footer-inner">
       <div>
         <p class="footer-title">180 Degrees Consulting PUCP</p>
-        <p class="footer-sub">Portal de Transparencia Financiera · Ciclo {CICLO}</p>
+        <p class="footer-sub">Portal de Transparencia Financiera · Ciclo {ciclo}</p>
       </div>
       <div class="footer-meta">
         <p>Información derivada del Registro de Transacciones mensual.</p>
@@ -282,7 +301,8 @@ def render_fila(*, titulo, monto, fecha, categoria, descripcion, tipo,
 # =============================================================================
 # Página mes
 # =============================================================================
-def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str) -> str:
+def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str,
+               meses_ciclo: list) -> str:
     # delta de saldo
     delta = info.saldo_final - info.saldo_inicial
     delta_sign = "+" if delta >= 0 else "−"
@@ -331,6 +351,12 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
         <span class="stat-label">Inversión IME</span>
         <span class="stat-value ambar">{fmt_soles(info.inversion)}</span>
       </div>''')
+    deuda = narrativa.get("deuda")
+    if deuda:
+        stat_items.append(f'''<div class="stat">
+        <span class="stat-label">Deuda pendiente</span>
+        <span class="stat-value ambar">{fmt_soles(deuda["monto"])}</span>
+      </div>''')
     stat_strip = f"""
     <div class="stat-strip">
       {''.join(stat_items)}
@@ -345,7 +371,7 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
             titulo=f['nombre'],
             monto=f['monto'],
             fecha=f.get('fecha', ''),
-            categoria='',
+            categoria=f.get('categoria_ui', ''),
             descripcion=f.get('detalle', ''),
             tipo='in',
             badge_txt='Ingreso',
@@ -373,6 +399,28 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
 
     # ---- Subtotal headers
     egresos_total = info.egresos_op + info.inversion
+
+    # ---- Pasivo (préstamo pendiente de reposición)
+    deuda_html = ""
+    if deuda:
+        deuda_html = f"""
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Pasivo</p>
+          <h3 class="section-title-big">Préstamo pendiente</h3>
+        </div>
+        <div class="section-total" style="color:var(--ambar)">
+          <span class="total-label">Deuda</span>
+          <span class="total-value" style="color:var(--ambar)">{fmt_soles(deuda["monto"])}</span>
+        </div>
+      </div>
+      <div class="info-box">
+        <strong>{esc(deuda["titulo"])}</strong>
+        {md(deuda["detalle"])}
+      </div>
+    </section>
+    """
 
     # ---- Charts
     dist = {}
@@ -482,6 +530,8 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
       <div class="tx-list">{''.join(filas_egreso)}</div>
     </section>
 
+    {deuda_html}
+
     <section class="section">
       <p class="section-eyebrow">Visualización</p>
       <h3 class="section-title-big">Distribución del gasto</h3>
@@ -506,18 +556,32 @@ def render_mes(info: InformeMes, slug: str, narrativa: dict, xlsx_filename: str)
     </section>
     """
     return layout(f"{info.mes} {info.ciclo} · 180DC PUCP", body,
+                  ciclo=info.ciclo, meses_nav=meses_ciclo,
                   slug_actual=slug, asset_prefix="..")
 
 
 # =============================================================================
 # Página índice
 # =============================================================================
-def render_index(infos: list[InformeMes]) -> str:
+def render_index(ciclos_render: list[dict]) -> str:
+    """ciclos_render: [{"ciclo", "meses", "infos"}], del más antiguo al más nuevo.
+
+    El resumen de cifras corresponde al ciclo vigente que ya tenga meses
+    publicados; los ciclos anteriores se listan debajo como histórico.
+    """
+    con_datos = [c for c in ciclos_render if c["infos"]]
+    if not con_datos:
+        raise SystemExit("No hay ningún mes publicable: revisa data/ y CICLOS.")
+    actual = con_datos[-1]
+    anteriores = con_datos[:-1]
+    infos = actual["infos"]
+    ciclo_actual = actual["ciclo"]
+
     total_ing = sum(i.ingresos for i in infos)
     total_eg = sum(i.egresos_op for i in infos)
     total_inv = sum(i.inversion for i in infos)
-    saldo_inicio = infos[0].saldo_inicial if infos else 0
-    saldo_actual = infos[-1].saldo_final if infos else 0
+    saldo_inicio = infos[0].saldo_inicial
+    saldo_actual = infos[-1].saldo_final
     delta_ciclo = saldo_actual - saldo_inicio
     delta_sign = "+" if delta_ciclo >= 0 else "−"
     delta_cls = "up" if delta_ciclo >= 0 else "down"
@@ -529,7 +593,7 @@ def render_index(infos: list[InformeMes]) -> str:
       <h1 class="hero-title">Reporte de transparencia financiera</h1>
       <p class="hero-lead">
         Movimiento financiero detallado de la agrupación durante el ciclo
-        académico {CICLO}. Cada transacción cuenta con su descripción y el
+        académico {ciclo_actual}. Cada transacción cuenta con su descripción y el
         archivo fuente está disponible para verificación.
       </p>
       <div class="hero-saldo-strip">
@@ -572,12 +636,13 @@ def render_index(infos: list[InformeMes]) -> str:
     """
 
     # ---- Month cards
-    cards = []
-    for idx, (info, cfg) in enumerate(zip(infos, MESES_CONFIG), 1):
+    def _cards(meses, lista):
+      out = []
+      for idx, (info, cfg) in enumerate(zip(lista, meses), 1):
         delta_mes = info.saldo_final - info.saldo_inicial
         d_sign = "+" if delta_mes >= 0 else "−"
         d_cls = "up" if delta_mes >= 0 else "down"
-        cards.append(f"""
+        out.append(f"""
         <a class="mes-card" href="meses/{cfg['slug']}.html">
           <div class="mes-card-head">
             <div>
@@ -610,6 +675,28 @@ def render_index(infos: list[InformeMes]) -> str:
           </div>
         </a>
         """)
+      return "".join(out)
+
+    cards = _cards(actual["meses"], infos)
+
+    # ---- Histórico: ciclos anteriores
+    historico = ""
+    for c in reversed(anteriores):
+        historico += f"""
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Histórico</p>
+          <h3 class="section-title-big">Ciclo {c["ciclo"]}</h3>
+        </div>
+        <div class="section-total">
+          <span class="total-label">Saldo de cierre</span>
+          <span class="total-value">{fmt_soles(c["infos"][-1].saldo_final)}</span>
+        </div>
+      </div>
+      <div class="meses-grid">{_cards(c["meses"], c["infos"])}</div>
+    </section>
+    """
 
     body = f"""
     {hero}
@@ -619,11 +706,13 @@ def render_index(infos: list[InformeMes]) -> str:
       <div class="section-head">
         <div>
           <p class="section-eyebrow">Reportes</p>
-          <h3 class="section-title-big">Informes mensuales</h3>
+          <h3 class="section-title-big">Informes mensuales · Ciclo {ciclo_actual}</h3>
         </div>
       </div>
-      <div class="meses-grid">{''.join(cards)}</div>
+      <div class="meses-grid">{cards}</div>
     </section>
+
+    {historico}
 
     <section class="section two-col">
       <div>
@@ -666,6 +755,7 @@ def render_index(infos: list[InformeMes]) -> str:
     </section>
     """
     return layout("180DC PUCP · Transparencia Financiera", body,
+                  ciclo=ciclo_actual, meses_nav=actual["meses"],
                   slug_actual=None, asset_prefix=".")
 
 
@@ -679,28 +769,76 @@ def main():
     downloads_dir.mkdir(exist_ok=True)
 
     import shutil
-    infos = []
-    for cfg in MESES_CONFIG:
-        xlsx_path = DATA_DIR / cfg["xlsx"]
-        shutil.copy2(xlsx_path, downloads_dir / cfg["xlsx"])
-        info = cargar_mes(str(xlsx_path), cfg["mes"], ciclo=CICLO)
-        infos.append(info)
-        html = render_mes(info, cfg["slug"], NARRATIVA.get(cfg["mes"], {}), cfg["xlsx"])
-        out = OUT_DIR / "meses" / f"{cfg['slug']}.html"
-        out.write_text(html, encoding="utf-8")
-        print(f"OK -> {out.relative_to(ROOT)}")
 
-    index_html = render_index(infos)
-    (OUT_DIR / "index.html").write_text(index_html, encoding="utf-8")
-    print(f"OK -> site/index.html")
-    print(f"OK -> site/downloads/  ({len(MESES_CONFIG)} archivos)")
+    # Los slugs son nombres de archivo web: no pueden repetirse entre ciclos.
+    vistos = {}
+    for c in CICLOS:
+        for m in c["meses"]:
+            if m["slug"] in vistos:
+                raise SystemExit(
+                    f'ERROR: el slug "{m["slug"]}" se repite en los ciclos '
+                    f'{vistos[m["slug"]]} y {c["ciclo"]}. Ponle un slug distinto '
+                    f'(ej. "{m["slug"]}-{c["ciclo"]}") en CICLOS.'
+                )
+            vistos[m["slug"]] = c["ciclo"]
+
+    ciclos_render = []
+    pendientes = []
+    n_archivos = 0
+    for c in CICLOS:
+        meses_ok, infos = [], []
+        for cfg in c["meses"]:
+            xlsx_path = DATA_DIR / cfg["xlsx"]
+            if not xlsx_path.exists():
+                # El mes está registrado pero su Excel todavía no llega:
+                # se omite en vez de romper el build.
+                pendientes.append((c["ciclo"], cfg["mes"], cfg["xlsx"]))
+                continue
+            shutil.copy2(xlsx_path, downloads_dir / cfg["xlsx"])
+            n_archivos += 1
+            infos.append(cargar_mes(str(xlsx_path), cfg["mes"], ciclo=c["ciclo"]))
+            meses_ok.append(cfg)
+        ciclos_render.append({"ciclo": c["ciclo"], "meses": meses_ok, "infos": infos})
+
+    for c in ciclos_render:
+        for cfg, info in zip(c["meses"], c["infos"]):
+            html = render_mes(info, cfg["slug"], NARRATIVA.get(cfg["mes"], {}),
+                              cfg["xlsx"], c["meses"])
+            out = OUT_DIR / "meses" / f"{cfg['slug']}.html"
+            out.write_text(html, encoding="utf-8")
+            print(f"OK -> {out.relative_to(ROOT)}")
+
+    (OUT_DIR / "index.html").write_text(render_index(ciclos_render), encoding="utf-8")
+    print("OK -> site/index.html")
+    print(f"OK -> site/downloads/  ({n_archivos} archivos)")
+
+    # Limpieza: borra paginas y descargas que ya no corresponden a ningun mes
+    # registrado (p. ej. un mes que se renombro o se quito de CICLOS).
+    slugs_ok = {cfg["slug"] for c in ciclos_render for cfg in c["meses"]}
+    xlsx_ok = {cfg["xlsx"] for c in ciclos_render for cfg in c["meses"]}
+    for f in (OUT_DIR / "meses").glob("*.html"):
+        if f.stem not in slugs_ok:
+            f.unlink()
+            print(f"LIMPIEZA -> se elimino site/meses/{f.name} (ya no esta en CICLOS)")
+    for f in downloads_dir.glob("*.xlsx"):
+        if f.name not in xlsx_ok:
+            f.unlink()
+            print(f"LIMPIEZA -> se elimino site/downloads/{f.name} (ya no esta en CICLOS)")
+
+    for ciclo, mes, xlsx in pendientes:
+        print(f"AVISO: {mes} ({ciclo}) esta registrado pero falta data/{xlsx}. "
+              f"Se omitio del sitio.")
 
     print("\n=== Cuadre ===")
-    for info in infos:
-        print(f"{info.mes:6s}  Ingresos: {fmt_soles(info.ingresos)}  "
-              f"Egresos op.: {fmt_soles(info.egresos_op)}  "
-              f"Inv: {fmt_soles(info.inversion)}  "
-              f"Saldo final: {fmt_soles(info.saldo_final)}")
+    for c in ciclos_render:
+        if not c["infos"]:
+            continue
+        print(f"-- Ciclo {c['ciclo']}")
+        for info in c["infos"]:
+            print(f"{info.mes:8s}  Ingresos: {fmt_soles(info.ingresos)}  "
+                  f"Egresos op.: {fmt_soles(info.egresos_op)}  "
+                  f"Inv: {fmt_soles(info.inversion)}  "
+                  f"Saldo final: {fmt_soles(info.saldo_final)}")
 
 
 if __name__ == "__main__":

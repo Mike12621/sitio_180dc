@@ -23,6 +23,14 @@ Por cada EGRESO (lista "egresos"):
 
 Y "nota_cierre": un párrafo de resumen del mes. Usa **negritas** con dobles
 asteriscos si quieres resaltar algo.
+
+Opcional, "deuda": un préstamo pendiente de reposición (dinero que alguien
+adelantó y que la agrupación aún debe). No pasa por la cuenta bancaria, así que
+no afecta el saldo; se muestra aparte como pasivo.
+  - monto:   monto en soles (ej. 305.50)
+  - titulo:  a qué corresponde (ej. "Catering — 180 Talks")
+  - detalle: quién adelantó el dinero y en qué condiciones
+Si el mes no tiene préstamos pendientes, simplemente no incluyas la clave.
 """
 
 # Marzo 2026-1 ----------------------------------------------------------------
@@ -159,23 +167,49 @@ MAYO = {
             "es_inversion": False,
             "icono": "🎟️",
         },
+        {
+            "titulo": "ITF (traspase de cuenta)",
+            "monto": 0.05,
+            "fecha": "May",
+            "para_que": "Impuesto a las transacciones financieras generado por traspase de cuenta.",
+            "categoria_ui": "Impuestos / Bancario",
+            "es_inversion": False,
+            "icono": "🏦",
+        },
     ],
     "nota_cierre": (
-        "Mayo fue un mes **sin ingresos** y con un único concepto de gasto: "
-        "la entrega de los tres premios pendientes de la rifa pro fondos del "
-        "mes de febrero (S/ 37 + S/ 17 + S/ 9.50 = S/ 63.50). El saldo baja "
-        "ligeramente pero se mantiene sólido."
+        "Mayo fue un mes **sin ingresos** y con gasto mínimo: la entrega de "
+        "los tres premios pendientes de la rifa pro fondos del mes de febrero "
+        "(S/ 37 + S/ 17 + S/ 9.50 = S/ 63.50) más S/ 0.05 de ITF por traspase "
+        "bancario. El saldo baja ligeramente pero se mantiene sólido."
     ),
 }
 
 # Junio 2026-1 ----------------------------------------------------------------
 JUNIO = {
-    "fuentes_ingresos": [],
+    "fuentes_ingresos": [
+        {
+            "nombre": "Recaudación — Rifa pro fondos",
+            "monto": 100.0,
+            "fecha": "15/06/2026 - 30/06/2026",
+            "detalle": "Venta de tickets de rifa a S/ 5 cada uno (20 tickets vendidos entre el 15 y 30 de junio). Periodo de venta aún abierto.",
+            "categoria_ui": "Recaudación",
+            "icono": "🎟️",
+        },
+        {
+            "nombre": "Recaudación — Conexión 180 DC",
+            "monto": 15.0,
+            "fecha": "29/06/2026 - 30/06/2026",
+            "detalle": "Taller abierto Conexión 180 DC a S/ 5 por entrada. 3 participantes inscritos en junio.",
+            "categoria_ui": "Recaudación",
+            "icono": "🎓",
+        },
+    ],
     "egresos": [
         {
             "titulo": "Reserva de nombre",
             "monto": 26.40,
-            "fecha": "01/06/2026",
+            "fecha": "03/06/2026",
             "para_que": "Pago por reserva de nombre ante SUNARP como parte del proceso de constitución de la agrupación.",
             "categoria_ui": "Constitución",
             "es_inversion": False,
@@ -184,7 +218,7 @@ JUNIO = {
         {
             "titulo": "Costos registrales",
             "monto": 130.00,
-            "fecha": "05/06/2026",
+            "fecha": "14/06/2026",
             "para_que": "Costos registrales asociados al proceso de constitución formal de la agrupación.",
             "categoria_ui": "Constitución",
             "es_inversion": False,
@@ -193,20 +227,190 @@ JUNIO = {
         {
             "titulo": "Costos notariales",
             "monto": 821.50,
-            "fecha": "10/06/2026",
+            "fecha": "14/06/2026",
             "para_que": "Honorarios notariales para la escritura pública de constitución de la agrupación.",
             "categoria_ui": "Constitución",
             "es_inversion": False,
             "icono": "⚖️",
         },
+        {
+            "titulo": "Catering — Pre 180 Talks",
+            "monto": 40.00,
+            "fecha": "27/06/2026",
+            "para_que": "Catering para el evento Pre 180 Talks.",
+            "categoria_ui": "Eventos",
+            "es_inversion": False,
+            "icono": "🥗",
+        },
+        {
+            "titulo": "Regalos para jueces — Pre 180 Talks",
+            "monto": 23.60,
+            "fecha": "28/06/2026",
+            "para_que": "Regalos para los jueces del evento Pre 180 Talks.",
+            "categoria_ui": "Eventos",
+            "es_inversion": False,
+            "icono": "🎁",
+        },
+        {
+            "titulo": "Vasos y bocaditos — Pre 180 Talks",
+            "monto": 45.38,
+            "fecha": "28/06/2026",
+            "para_que": "Vasos y bocaditos para el evento Pre 180 Talks.",
+            "categoria_ui": "Eventos",
+            "es_inversion": False,
+            "icono": "🥤",
+        },
+        {
+            "titulo": "Materiales — Integración (picnic)",
+            "monto": 4.40,
+            "fecha": "28/06/2026",
+            "para_que": "Materiales para la actividad de integración tipo picnic.",
+            "categoria_ui": "Integración",
+            "es_inversion": False,
+            "icono": "🧺",
+        },
     ],
     "nota_cierre": (
         "Junio concentra el **gasto más importante del ciclo**: la constitución "
         "formal de 180DC PUCP como persona jurídica (reserva de nombre, costos "
-        "registrales y notariales por un total de S/ 977.90). No hubo ingresos "
-        "en el mes, y el saldo baja significativamente. Es un gasto estratégico "
-        "y no recurrente que habilita a la agrupación para operar formalmente."
+        "registrales y notariales por un total de S/ 977.90). También se "
+        "realizaron gastos para el evento Pre 180 Talks (catering, regalos para "
+        "jueces y bocaditos por S/ 108.98) y una integración tipo picnic "
+        "(S/ 4.40). Por el lado de ingresos, arrancaron dos actividades de "
+        "recaudación: la **rifa pro fondos** (S/ 100) y el **taller Conexión "
+        "180 DC** (S/ 15), sumando S/ 115 que amortiguan parcialmente los "
+        "egresos."
     ),
+}
+
+# Julio 2026-1 ----------------------------------------------------------------
+JULIO = {
+    "fuentes_ingresos": [
+        {
+            "nombre": "Recaudación — Rifa pro fondos",
+            "monto": 135.0,
+            "fecha": "01/07/2026 - 17/07/2026",
+            "detalle": "Continuación de la venta de tickets de rifa a S/ 5 cada uno. Periodo de venta aún abierto; premios pendientes de entrega.",
+            "categoria_ui": "Recaudación",
+            "icono": "🎟️",
+        },
+        {
+            "nombre": "Recaudación — Conexión 180 DC",
+            "monto": 10.0,
+            "fecha": "01/07/2026 - 03/07/2026",
+            "detalle": "Taller abierto Conexión 180 DC a S/ 5 por entrada. 2 participantes inscritos en julio (Fernando Zentner, Arianna Malarin).",
+            "categoria_ui": "Recaudación",
+            "icono": "🎓",
+        },
+    ],
+    "egresos": [
+        {
+            "titulo": "Reserva de nombre para RUC",
+            "monto": 33.00,
+            "fecha": "10/07/2026",
+            "para_que": "Reserva de nombre necesaria para la obtención del RUC de la agrupación.",
+            "categoria_ui": "Constitución / RUC",
+            "es_inversion": False,
+            "icono": "📋",
+        },
+        {
+            "titulo": "Transporte a notaría",
+            "monto": 30.80,
+            "fecha": "10/07/2026",
+            "para_que": "Transporte a la notaría para tramitar documentos relacionados al RUC.",
+            "categoria_ui": "Constitución / RUC",
+            "es_inversion": False,
+            "icono": "🚕",
+        },
+        {
+            "titulo": "Transporte para trámite RUC",
+            "monto": 9.00,
+            "fecha": "25/07/2026",
+            "para_que": "Transporte para gestiones adicionales de obtención del RUC.",
+            "categoria_ui": "Constitución / RUC",
+            "es_inversion": False,
+            "icono": "🚕",
+        },
+        {
+            "titulo": "Bebidas para Pre 180 Talks",
+            "monto": 29.50,
+            "fecha": "25/07/2026",
+            "para_que": "Reembolso a Mateo por bebidas adquiridas para el evento Pre 180 Talks.",
+            "categoria_ui": "Eventos",
+            "es_inversion": False,
+            "icono": "🥤",
+        },
+        {
+            "titulo": "Bocaditos para integración (picnic)",
+            "monto": 23.00,
+            "fecha": "25/07/2026",
+            "para_que": "Bocaditos y materiales para la actividad de integración tipo picnic.",
+            "categoria_ui": "Integración",
+            "es_inversion": False,
+            "icono": "🧺",
+        },
+    ],
+    "nota_cierre": (
+        "Julio cierra con **saldo positivo neto** de S/ 19.70: los ingresos por "
+        "rifa y Conexión 180 DC (S/ 145) cubren los egresos operativos "
+        "(S/ 125.30), que incluyen trámites de constitución y RUC (S/ 72.80), "
+        "bebidas para el Pre 180 Talks (S/ 29.50) y materiales de integración "
+        "(S/ 23). El evento principal del mes fue el **180 Talks** (18 de "
+        "julio), cuyo catering de S/ 305.50 fue cubierto por un préstamo de "
+        "Amanda Gomez, pendiente de reposición sin intereses."
+    ),
+    "deuda": {
+        "monto": 305.50,
+        "titulo": "Catering — 180 Talks (18 de julio)",
+        "detalle": (
+            "Amanda Gomez adelantó S/ 305.50 para cubrir el catering del evento "
+            "180 Talks. El pago se realizó directamente al proveedor y no pasó "
+            "por la cuenta bancaria de la agrupación. Este monto está "
+            "**pendiente de reposición**, sin intereses. Es el único préstamo "
+            "vigente."
+        ),
+    },
+}
+
+# Agosto 2026-2 ---------------------------------------------------------------
+# Primer mes del ciclo 2026-2. Arranca con el saldo de cierre del 2026-1
+# (S/ 92.87), que figura en la fila "Ord. = 0" del Excel del mes.
+AGOSTO = {
+    "fuentes_ingresos": [],
+    "egresos": [
+        {
+            "titulo": "Catering — 180 Talks (saldo pendiente)",
+            "monto": 38.62,
+            "fecha": "23/08/2026",
+            "para_que": (
+                "Pago del saldo pendiente del servicio de catering del evento "
+                "180 Talks, realizado en julio. Con esto queda cancelado el "
+                "servicio con el proveedor."
+            ),
+            "categoria_ui": "Eventos",
+            "es_inversion": False,
+            "icono": "🥗",
+        },
+    ],
+    "nota_cierre": (
+        "Agosto abre el ciclo **2026-2** con el saldo de cierre del ciclo "
+        "anterior (S/ 92.87). Fue un mes **sin ingresos y con un único "
+        "movimiento**: el pago de S/ 38.62 por el saldo pendiente del catering "
+        "del **180 Talks**, con lo que queda cancelado el servicio con el "
+        "proveedor. El préstamo de S/ 305.50 que cubrió el grueso de ese "
+        "catering **sigue vigente** y pendiente de reposición."
+    ),
+    "deuda": {
+        "monto": 305.50,
+        "titulo": "Catering — 180 Talks (18 de julio)",
+        "detalle": (
+            "Amanda Gomez adelantó S/ 305.50 para cubrir el catering del evento "
+            "180 Talks. El pago se realizó directamente al proveedor y no pasó "
+            "por la cuenta bancaria de la agrupación. Al cierre de agosto el "
+            "monto **sigue pendiente de reposición**, sin intereses. Es el "
+            "único préstamo vigente."
+        ),
+    },
 }
 
 # Registro global por mes
@@ -215,4 +419,6 @@ NARRATIVA = {
     "Abril": ABRIL,
     "Mayo": MAYO,
     "Junio": JUNIO,
+    "Julio": JULIO,
+    "Agosto": AGOSTO,
 }
